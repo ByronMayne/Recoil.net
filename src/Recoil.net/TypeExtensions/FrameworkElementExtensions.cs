@@ -90,11 +90,11 @@ namespace RecoilNet
 		/// <typeparam name="T">The type of the view model</typeparam>
 		/// <param name="element">The element to assing</param>
 		/// <param name="factory">The factory that can be used to create the view model</param>
-		public static void UseRecoilViewModel<T>(this FrameworkElement element, Func<IRecoilStore?, T> factory)
+		public static void UseRecoilViewModel<T>(this FrameworkElement element, Func<IRecoilStore, T> factory)
 		{
 			element.InvokeWhenLoaded(() =>
 			{
-				IRecoilStore? store = XamlUtility.GetRecoilStore(element);
+				IRecoilStore store = XamlUtility.GetRecoilStore(element);
 				element.DataContext = factory(store);
 			});
 		}
@@ -112,7 +112,7 @@ namespace RecoilNet
 
 			element.InvokeWhenLoaded(() =>
 			{
-				IRecoilStore store = element.GetRecoilStore();
+				IRecoilStore store = XamlUtility.GetRecoilStore(element);
 				state.SetStore(store);
 			});
 

@@ -1,5 +1,6 @@
 ﻿using RecoilNet.Internal;
 using RecoilNet.State;
+using RecoilNet.Utility;
 
 namespace RecoilNet
 {

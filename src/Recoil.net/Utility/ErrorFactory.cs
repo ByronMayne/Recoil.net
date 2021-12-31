@@ -1,4 +1,5 @@
-﻿using RecoilNet.State;
+﻿using Recoil.net;
+using RecoilNet.State;
 using System.ComponentModel;
 using System.Windows;
 
@@ -9,9 +10,9 @@ namespace RecoilNet.Utility
 	/// </summary>
 	internal static class ErrorFactory
 	{
-		public static InvalidOperationException StateCreatedAfterComponentInitialized(Type elementType)
+		public static RecoilException StateCreatedAfterComponentInitialized(Type elementType)
 		{
-			return new InvalidOperationException($@"
+			return new RecoilException($@"
 The Framework element '{elementType}' has already been initialized. You must create Recoil State objects before 'InitializeComponent' otherwise bindings will fail. You can 
 also avoid this exception by setting the argument {nameof(RecoilStateOptions.AllowInitializedElements)} when creating the state but you *must* implement {nameof(INotifyPropertyChanged)} so the
 value gets picked up.
@@ -39,7 +40,7 @@ public class MyClass : FrameworkElement
 		/// </summary>
 		/// <param name="dependencyObject">The object to start looking for the parent from </param>
 		/// <returns></returns>
-		public static Exception NoRecoilRootFound(DependencyObject dependencyObject)
+		public static RecoilException NoRecoilRootFound(DependencyObject dependencyObject)
 		{
 			bool isLoaded = dependencyObject is FrameworkElement element ? element.IsLoaded : true;
 
@@ -50,23 +51,23 @@ public class MyClass : FrameworkElement
 				errorMessage += "\n You were requesting the root from an element that has not been loaded yet, this will always fail.";
 			}
 
-			throw new InvalidOperationException(errorMessage);
+			throw new RecoilException(errorMessage);
 		}
 
 		/// <summary>
 		/// Exception thrown while trying to set the value of an object that is not mutable
 		/// </summary>
-		public static Exception AssigningValueToNonMutableType<T>(RecoilValue<T> objectType)
+		public static RecoilException AssigningValueToNonMutableType<T>(RecoilValue<T> objectType)
 		{
 			string error = $"You are unable to asssing a value to the object of type '{objectType.GetType().Name}' of the key '{objectType.Key}' because " +
 				$"it's marked at not mutable.";
-			return new InvalidOperationException(error);
+			return new RecoilException(error);
 		}
 
-		public static Exception NoMatchingConstructorForStore(Type type)
+		public static RecoilException NoMatchingConstructorForStore(Type type)
 		{
 			string error = $"The type {type.FullName} does not contain a constructor that takes a single argument of type {typeof(IRecoilStore).FullName}. It must have one";
-			throw new InvalidOperationException(error);
+			throw new RecoilException(error);
 		}
 	}
 }
