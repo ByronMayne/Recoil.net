@@ -1,6 +1,8 @@
 ﻿using RecoilNet.Interfaces;
+using RecoilNet.Providers;
 using RecoilNet.State;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace RecoilNet
 {
@@ -12,57 +14,25 @@ namespace RecoilNet
 	[DebuggerDisplay("Selector<{typeof(T).Name}>: {Key}")]
 	public class Selector<T> : RecoilValue<T>
 	{
-		private class Builder : ISelectorBuilder
-		{
-			private readonly IRecoilStore? m_store;
-			private readonly Selector<T> m_selector;
+		public delegate Task<T?> ValueBuilder(IValueProvider asyncBuilder);
 
-			public Builder(IRecoilStore? store, Selector<T> selector)
-			{
-				m_selector = selector;
-				m_store = store;
-			}
-
-			public TValue? Value<TValue>(Atom<TValue> atom)
-			{
-				ArgumentNullException.ThrowIfNull(atom);
-
-				atom.AddDependent(m_selector);
-				return atom.GetValue(m_store);
-			}
-
-			public TValue? Value<TValue>(Selector<TValue> selector)
-			{
-				ArgumentNullException.ThrowIfNull(selector);
-
-				selector.AddDependent(m_selector);
-				return selector.GetValue(m_store);
-			}
-		}
-
-		public delegate T? GetValueDelegate(ISelectorBuilder builder);
+		private readonly ValueBuilder m_valueBuilder;
 
 		/// <summary>
-		/// Ges
+		/// Initializes a new instance of a selector that uses an sync method
 		/// </summary>
-		public GetValueDelegate Get { get; }
-
-		/// <summary>
-		/// Initializes a new instance of a selector
-		/// </summary>
-		/// <param name="get"></param>
-		public Selector(string key, GetValueDelegate get) : base(key, false)
+		/// <param name="builder">The method to get the value</param>
+		public Selector(string key, ValueBuilder builder) : base(key, false)
 		{
-			ArgumentNullException.ThrowIfNull(get);
-			Get = get;
+			ArgumentNullException.ThrowIfNull(builder);
+			m_valueBuilder = builder;
 		}
-
 
 		/// <inheritdoc cref="RecoilValue{T}"/>
-		public override T? GetValue(IRecoilStore? recoilStore)
+		public override async Task<T?> GetValueAsync(IRecoilStore? recoilStore)
 		{
-			Builder builder = new Builder(recoilStore, this);
-			return Get(builder);
+			ValueProvider<T> valueProvider = new ValueProvider<T>(recoilStore, this);
+			return await m_valueBuilder(valueProvider);
 		}
 	}
 }

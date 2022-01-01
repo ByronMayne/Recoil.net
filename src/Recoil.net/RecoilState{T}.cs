@@ -1,7 +1,5 @@
 ﻿using RecoilNet.State;
 using System.ComponentModel;
-using System.Globalization;
-using System.Windows;
 
 namespace RecoilNet
 {
@@ -12,64 +10,133 @@ namespace RecoilNet
 	/// <typeparam name="T">The type of the value being held</typeparam>
 	public sealed class RecoilState<T> : RecoilState
 	{
-		private readonly RecoilValue<T> m_recoilObject;
-		public delegate T? GetDelegate();
-		public delegate void SetDelegate(T? value);
+		public class ValuePropertyDescriptor : PropertyDescriptor
+		{
+			public ValuePropertyDescriptor() : base("Value", null)
+			{
+				ComponentType = typeof(RecoilState<T>);
+				IsReadOnly = false;
+				PropertyType = typeof(T);
+			}
+
+			public override Type ComponentType { get; }
+			public override bool IsReadOnly { get; }
+			public override Type PropertyType { get; }
+
+
+			public override bool CanResetValue(object component)
+			{
+				return true;
+			}
+
+			public override object? GetValue(object? component)
+			{
+				if (typeof(T) == typeof(string))
+				{
+
+					return "String Value";
+				}
+				return default(T);
+			}
+
+			public override void ResetValue(object component)
+			{ }
+
+			public override void SetValue(object? component, object? value)
+			{ }
+
+			public override bool ShouldSerializeValue(object component)
+			{
+				return false;
+			}
+		}
+
+		private const string VALUE_PROPERTY_NAME = "Value";
+
+		private T? m_value;
+		private RecoilValue<T> m_recoilValue;
 
 		/// <summary>
-		/// Gets the value of the delegate 
-		/// </summary>
-		public GetDelegate Getter { get; }
-
-		/// <summary>
-		/// Sets the value of the delegate
-		/// </summary>
-		public SetDelegate Setter { get; }
-
-		/// <summary>
-		/// Gets the current value of the state
+		/// Gets or sets the value of th recoil state. It should be noted that setting the value 
+		/// happens in the background in an async operation so the value will not be accessable right away.
 		/// </summary>
 		public T? Value
 		{
-			get => m_recoilObject.GetValue(m_store);
-			set => m_recoilObject.SetValue(m_store, value);
+			get => m_value;
+			set
+			{
+				m_value = value; // set it for now but it will be overriden later 
+				m_recoilValue.SetValue(m_store, value);
+				IsLoading = true;
+			}
 		}
+
+		/// <summary>
+		/// Gets if the value is currently being calculated 
+		/// </summary>
+		public bool IsLoading { get; private set; }
 
 		/// <summary>
 		/// Creates a new Atom Accessor with the getter and setter defined.
 		/// </summary>
 		/// <param name="get">A delegate to fetch the value</param>
 		/// <param name="set">A delegate to set the value</param>
-		public RecoilState(RecoilValue<T> recoilObject, IRecoilStore? store) : base(recoilObject, store)
+		public RecoilState(RecoilValue<T> recoilValue, IRecoilStore? store) : base(recoilValue, store)
 		{
-			m_recoilObject = recoilObject;
-			Getter = () => Value;
-			Setter = (v) => Value = v;
-		}
+			m_recoilValue = recoilValue;
 
-
-		/// <inheritdoc cref="RecoilState"/>
-		public override object? GetValue()
-			=> Value;
-
-		/// <inheritdoc cref="RecoilState"/>
-		protected override void OnValuesChanged(IList<RecoilValue> changedValues)
-		{
-			if (changedValues.Contains(m_recoilObject))
+			// Load the default value 
+			Task.Run(async () =>
 			{
-				RaisePropertyChanged(nameof(Value));
-			}
+				IsLoading = true;
+				try
+				{
+					m_value = await m_recoilValue.GetValueAsync(store);
+				}
+				finally
+				{
+					IsLoading = false;
+				}
+				if (!EqualityComparer<T>.Default.Equals(m_value, default(T)))
+				{
+					RaisePropertyChanged(nameof(Value));
+				}
+			});
 		}
 
-		/// <summary>
-		/// Deconstructors
-		/// </summary>
-		/// <param name="get"></param>
-		/// <param name="set"></param>
-		public void Deconstruct(out GetDelegate get, out SetDelegate set)
+		/// <inheritdoc cref="RecoilState"/>
+		protected override void OnStoreSet(IRecoilStore? store)
 		{
-			get = Getter;
-			set = Setter;
+			if (m_store == store) return;
+
+			if (m_store != null)
+			{
+				m_store.States.Remove(this);
+			}
+
+			m_store = store;
+
+			if (m_store != null)
+			{
+				m_store.States.Add(this);
+			}
+
+			RaisePropertyChanged(nameof(Value));
+		}
+
+		/// <inheritdoc cref="RecoilState"/>
+		protected override Task OnValueChangedAsync(IRecoilStore store, object? newValue)
+		{
+			m_value = (T?)newValue;
+			RaisePropertyChanged(nameof(Value));
+			return Task.CompletedTask;
+		}
+
+		/// <inheritdoc cref="RecoilState"/>
+		protected override async Task OnDependentChangedAsync(IRecoilStore store, RecoilValue dependentValue)
+		{
+			m_value = await m_recoilValue.GetValueAsync(m_store);
+			RaisePropertyChanged(nameof(Value));
 		}
 	}
 }

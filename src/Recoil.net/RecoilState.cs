@@ -1,9 +1,5 @@
-﻿using RecoilNet.Converters;
-using RecoilNet.State;
+﻿using RecoilNet.State;
 using System.ComponentModel;
-using System.Globalization;
-using System.Reflection;
-using System.Windows;
 
 namespace RecoilNet
 {
@@ -12,25 +8,32 @@ namespace RecoilNet
 	/// the <see cref="IRecoilStore"/> instance that holds it's value.
 	/// </summary>
 	/// <typeparam name="T">The type of the value being held</typeparam>
-	[TypeConverter(typeof(RecoilStateConverter))]
 	public abstract class RecoilState : INotifyPropertyChanged
 	{
-		private static PropertyChangedEventArgs s_valueChangedEventArgs;
+		private static readonly PropertyChangedEventArgs s_valueChangedEventArgs;
 
 		/// <inheritdoc cref="INotifyPropertyChanged"/>
 		public event PropertyChangedEventHandler? PropertyChanged;
 
+		protected readonly SynchronizationContext? m_syncContext;
 		protected IRecoilStore? m_store;
+
+		/// <summary>
+		/// Gets the recoil value that this state is watching 
+		/// </summary>
+		public RecoilValue RecoilValue { get; }
 
 		static RecoilState()
 		{
 			s_valueChangedEventArgs = new PropertyChangedEventArgs("Value");
 		}
 
-		protected RecoilState(RecoilValue recoilObject, IRecoilStore? recoilStore)
+		protected RecoilState(RecoilValue recoilValue, IRecoilStore? recoilStore)
 		{
+			m_syncContext = SynchronizationContext.Current;
+			RecoilValue = recoilValue;
 			PropertyChanged = null;
-			SetStore(recoilStore); 
+			SetStore(recoilStore);
 		}
 
 		/// <summary>
@@ -38,7 +41,19 @@ namespace RecoilNet
 		/// </summary>
 		protected void RaisePropertyChanged(string propertyName)
 		{
-			if(PropertyChanged != null)
+			if (PropertyChanged == null)
+			{
+				return;
+			}
+
+			if (m_syncContext != null)
+			{
+				m_syncContext.Post(_ =>
+				{
+					PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+				}, null);
+			}
+			else
 			{
 				PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 			}
@@ -46,35 +61,50 @@ namespace RecoilNet
 
 
 		/// <summary>
-		/// Sets the instance of the recoil store that we are using.
+		/// Invoked whenver the <see cref="IRecoilStore"/> instance 
+		/// has changed.
+		/// </summary>
+		/// <param name="store">The current store if any</param>
+		protected abstract void OnStoreSet(IRecoilStore? store);
+
+		/// <summary>
+		/// Raised whenever the store has received a new value for this state.
+		/// </summary>
+		/// <param name="store">The store that provided the value</param>
+		/// <param name="newValue">The value that was provided</param>
+		/// <returns>A task to await on</returns>
+		protected abstract Task OnValueChangedAsync(IRecoilStore store, object? newValue);
+
+		/// <summary>
+		/// Raised whenever a value that this state depends on changes.
+		/// </summary>
+		/// <param name="store">The store that saw the change</param>
+		/// <param name="dependentValue">The dependent value that changed</param>
+		/// <returns>A task to await on</returns>
+		protected abstract Task OnDependentChangedAsync(IRecoilStore store, RecoilValue dependentValue);
+
+		/// <summary>
+		/// Internal function to allow store to be set
 		/// </summary>
 		internal void SetStore(IRecoilStore? store)
 		{
-			if (m_store == store) return;
-
-			if (m_store != null)
-			{
-				m_store.OnValueChanged -= OnValuesChanged;
-			}
-
-			m_store = store;
-
-			if(m_store != null)
-			{
-				m_store.OnValueChanged += OnValuesChanged;
-			}
-
-			RaisePropertyChanged("Value");
+			OnStoreSet(store);
 		}
 
 		/// <summary>
-		/// Invoked whenver a value in the store changes
+		/// Internal function to invoke <see cref="OnValueChangedAsync(IRecoilStore, object?)"/>
 		/// </summary>
-		protected abstract void OnValuesChanged(IList<RecoilValue> changedValues);
+		internal Task ValueChangedAsync(IRecoilStore recoilStore, object? newValue)
+		{
+			return OnValueChangedAsync(recoilStore, newValue);
+		}
 
 		/// <summary>
-		/// Returns back the value of the state
+		/// Internal function to invoke <see cref="OnDependentChangedAsync(IRecoilStore, RecoilValue)"/>
 		/// </summary>
-		public abstract object? GetValue();
+		internal Task DependentChangedAsync(IRecoilStore recoilStore, RecoilValue dependentValue)
+		{
+			return OnDependentChangedAsync(recoilStore, dependentValue);
+		}
 	}
 }

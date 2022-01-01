@@ -1,5 +1,4 @@
-﻿using Recoil.net;
-using RecoilNet.State;
+﻿using RecoilNet.State;
 using System.ComponentModel;
 using System.Windows;
 

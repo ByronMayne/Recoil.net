@@ -53,7 +53,7 @@
 		/// <param name="key">The unique key for the selector</param>
 		/// <param name="get">The function to build the selector</param>
 		/// <returns>The created selector</returns>
-		public static Selector<T> CreateSelector<T>(string key, Selector<T>.GetValueDelegate get)
+		public static Selector<T> CreateSelector<T>(string key, Selector<T>.ValueBuilder get)
 			=> new Selector<T>(key, get);
 
 	}

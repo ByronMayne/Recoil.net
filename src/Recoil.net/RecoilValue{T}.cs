@@ -5,12 +5,12 @@ using RecoilNet.Utility;
 namespace RecoilNet
 {
 	/// <summary>
-	/// Base class that contains logic shared amoung recoile types
+	/// Base class that contains logic shared among recoil types
 	/// </summary>
 	public abstract class RecoilValue<T> : RecoilValue
 	{
 		/// <summary>
-		/// Gets if this object has the ability to be set directrly 
+		/// Gets if this object has the ability to be set directly 
 		/// </summary>
 		public bool IsMutable { get; }
 
@@ -18,7 +18,6 @@ namespace RecoilNet
 		public RecoilValue(string key, bool isMutable) : base(key)
 		{
 			IsMutable = isMutable;
-
 		}
 
 		/// <summary>
@@ -27,7 +26,7 @@ namespace RecoilNet
 		/// <typeparam name="T">The type of the value</typeparam>
 		/// <param name="recoilStore">The store instance to attempt to fetch it from</param>
 		/// <returns>The value</returns>
-		public abstract T? GetValue(IRecoilStore? recoilStore);
+		public abstract Task<T?> GetValueAsync(IRecoilStore? recoilStore);
 
 		/// <summary>
 		/// Sets this objects value to the given store if it has a value

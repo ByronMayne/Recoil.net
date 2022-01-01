@@ -6,6 +6,11 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <LangVersion>10</LangVersion>
+    <RootNamespace>RecoilNet</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
 
 </Project>

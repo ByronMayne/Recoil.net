@@ -1,6 +1,4 @@
-﻿using Recoil.net.Utility;
-using RecoilNet.Internal;
-using RecoilNet.State;
+﻿using RecoilNet.State;
 using RecoilNet.Utility;
 using System.Reflection;
 using System.Windows;

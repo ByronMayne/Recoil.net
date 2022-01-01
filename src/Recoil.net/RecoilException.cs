@@ -1,11 +1,11 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Recoil.net
+namespace RecoilNet
 {
 	/// <summary>
 	/// Base exception thrown for all known exceptions in Recoil
 	/// </summary>
-	internal class RecoilException : Exception
+	public class RecoilException : Exception
 	{
 		public RecoilException()
 		{

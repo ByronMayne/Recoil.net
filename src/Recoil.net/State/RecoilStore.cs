@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace RecoilNet.State
 {
@@ -12,43 +13,19 @@ namespace RecoilNet.State
 	/// </summary>
 	public class RecoilStore : IRecoilStore
 	{
-		private record CallbackTarget(WeakReference Target, MethodInfo Method)
-		{
-			public void Invoke(IList<RecoilValue> changedValues)
-			{
-				Method.Invoke(Target.Target, new object[] { changedValues });
-			}
-		}
-
 		private readonly IDictionary<string, RecoilValue> m_objects;
 		private readonly IDictionary<string, object?> m_values;
-		private readonly IList<CallbackTarget> m_valueCallbacks;
+		
 
-		public event RecoilValueChangedDelegate OnValueChanged
-		{
-			add => m_valueCallbacks.Add(new CallbackTarget(new WeakReference(value.Target), value.Method));
-			remove
-			{
-				for (int i = m_valueCallbacks.Count - 1; i >= 0; i--)
-				{
-					CallbackTarget target = m_valueCallbacks[i];
+		/// <inheritdoc cref="IRecoilStore"/>
+		public IList<RecoilState> States { get; }
 
-
-
-					if (target.Method == value.Method && target.Target.IsAlive && target.Target == value.Target)
-					{
-						m_valueCallbacks.RemoveAt(i);
-						return;
-					}
-				}
-			}
-		}
 
 		public RecoilStore()
 		{
 			m_objects = new Dictionary<string, RecoilValue>();
 			m_values = new Dictionary<string, object?>();
-			m_valueCallbacks = new List<CallbackTarget>();
+			States = new List<RecoilState>();
 
 		}
 
@@ -80,25 +57,38 @@ namespace RecoilNet.State
 			// Set it 
 			m_values[recoilValue.Key] = value;
 
-			List<RecoilValue> changedValues = new List<RecoilValue>();
-			GetChangedValues(recoilValue, changedValues);
+			// Push update notifications onto another thread
+			Task.Run(() => NotifyListenersAsync(recoilValue));
+		}
 
-			foreach (CallbackTarget? listener in m_valueCallbacks)
+		private async void NotifyListenersAsync(RecoilValue rootChange)
+		{
+			HashSet<RecoilValue> dependents = new HashSet<RecoilValue>();
+			GetDepdendents(rootChange, dependents);
+
+			foreach(RecoilState state in States)
 			{
-				listener.Invoke(changedValues);
+				if(rootChange == state.RecoilValue)
+				{
+					await state.ValueChangedAsync(this, m_values[rootChange.Key]);
+				}
+				else if (dependents.Contains(state.RecoilValue))
+				{
+					await state.DependentChangedAsync(this, rootChange);
+				}
 			}
 		}
 
 
-		private static void GetChangedValues(RecoilValue current, List<RecoilValue> dependents)
+		private static void GetDepdendents(RecoilValue current, HashSet<RecoilValue> dependents)
 		{
-			dependents.Add(current);
-
 			if (current.Dependents.Count > 0)
 			{
 				foreach (RecoilValue dependent in current.Dependents)
 				{
-					GetChangedValues(dependent, dependents);
+					dependents.Add(dependent);
+
+					GetDepdendents(dependent, dependents);
 				}
 			}
 		}

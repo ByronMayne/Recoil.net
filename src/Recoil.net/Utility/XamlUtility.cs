@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Recoil.net.Utility
+namespace RecoilNet.Utility
 {
 	/// <summary>
 	/// Contains utility functions for work with XAML

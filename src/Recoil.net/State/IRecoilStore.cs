@@ -1,6 +1,6 @@
 ﻿namespace RecoilNet.State
 {
-	public delegate void RecoilValueChangedDelegate(IList<RecoilValue> changedValues);
+	public delegate Task RecoilValueChangedDelegate(IRecoilStore store, IList<RecoilValue> changedValues);
 
 	/// <summary>
 	/// Defines an object that can get and set the value of a atom or selector
@@ -8,9 +8,9 @@
 	public interface IRecoilStore
 	{
 		/// <summary>
-		/// Event raised whenever a value changes in the store
+		/// Gets the list of states that are being tracked by this store
 		/// </summary>
-		event RecoilValueChangedDelegate OnValueChanged;
+		IList<RecoilState> States { get; }
 
 		/// <summary>
 		/// Gets the value of the <see cref="RecoilValue{T}"/> 

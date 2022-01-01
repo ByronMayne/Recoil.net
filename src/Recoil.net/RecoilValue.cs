@@ -7,6 +7,15 @@ namespace RecoilNet
 	/// </summary>
 	public class RecoilValue : IEqualityComparer<RecoilValue>
 	{
+		public class EqualityComparer : IEqualityComparer<RecoilValue>
+		{
+			public bool Equals(RecoilValue? x, RecoilValue? y)
+				=> ReferenceEquals(x, y);
+
+			public int GetHashCode([DisallowNull] RecoilValue obj)
+				=> obj.Key.GetHashCode();
+		}
+
 		protected readonly HashSet<RecoilValue> m_dependents;
 
 		/// <summary>
