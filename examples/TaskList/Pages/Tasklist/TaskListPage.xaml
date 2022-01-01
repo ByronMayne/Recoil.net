@@ -1,0 +1,70 @@
+﻿<Page x:Class="TaskList.Pages.Tasklist.TaskListPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:TaskList.Pages.Tasklist" 
+      xmlns:recoil="clr-namespace:RecoilNet;assembly=Recoil.net"
+      mc:Ignorable="d" 
+      d:DesignHeight="800" d:DesignWidth="500"
+      d:DataContext="{d:DesignInstance Type=local:TaskListViewModel, IsDesignTimeCreatable=False}"
+      Title="Tasks">
+    <Grid>
+        <DockPanel LastChildFill="True">
+            <TextBlock 
+            DockPanel.Dock="Top"
+            Background="Purple" 
+            FontSize="30" 
+            TextAlignment="Left"
+            Padding="22"
+            TextWrapping="Wrap"
+            Foreground="White">Redux Fundamentals Example</TextBlock>
+
+            <StackPanel DockPanel.Dock="Top" HorizontalAlignment="Stretch" >
+                <StackPanel Orientation="Horizontal"  HorizontalAlignment="Stretch" >
+                    <TextBlock Text="First Name: "/>
+                    <TextBox Text="{Binding FirstName.Value, UpdateSourceTrigger=PropertyChanged}" Width="250" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal"  HorizontalAlignment="Stretch">
+                    <TextBlock Text="Last Name: "/>
+                    <TextBox Text="{Binding LastName.Value, UpdateSourceTrigger=PropertyChanged}"  Width="250" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal"  HorizontalAlignment="Stretch" >
+                    <TextBlock Text="Cl Number: "/>
+                    <TextBox Text="{Binding ChangelistNumber.Value, UpdateSourceTrigger=PropertyChanged}" Width="250" />
+                </StackPanel>
+
+                <TextBlock Text="Summary: "/>
+                <TextBox HorizontalAlignment="Stretch" Height="120"  Text="{Binding ChangelistSummary.Value, UpdateSourceTrigger=PropertyChanged}" >
+                </TextBox>
+            </StackPanel>
+
+            <StackPanel DockPanel.Dock="Top">
+                <TextBlock Text="{Binding ChangelistDescription.Value}"/>
+            </StackPanel>
+
+            <!-- Options -->
+            <StackPanel DockPanel.Dock="Bottom" Height="200">
+                <Rectangle Height="1" HorizontalAlignment="Stretch" Fill="Gray"/>
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel>
+                        <TextBlock>Actions</TextBlock>
+                        <Button>Mark All Complete</Button>
+                        <Button>Clear Completed</Button>
+
+                    </StackPanel>
+                    <StackPanel>
+
+                    </StackPanel>
+                    <StackPanel>
+
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+            <!-- Content -->
+            <StackPanel DockPanel.Dock="Top">
+
+            </StackPanel>
+        </DockPanel>
+    </Grid>
+</Page>

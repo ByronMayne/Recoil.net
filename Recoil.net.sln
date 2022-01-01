@@ -7,6 +7,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recoil.net", "src\Recoil.ne
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recoil.net.Tests", "src\Recoil.net.Tests\Recoil.net.Tests.csproj", "{5559009D-C7E0-453C-AC79-31ABB96AA1D0}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{2512A799-80D6-4897-954A-D4374023A381}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaskList", "examples\TaskList\TaskList.csproj", "{B60AE799-0118-48D3-88DF-9A1D14FCB09E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{85906F1C-FFAB-4F6C-BD1B-6253BE7FE895}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,9 +30,16 @@ Global
 		{5559009D-C7E0-453C-AC79-31ABB96AA1D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5559009D-C7E0-453C-AC79-31ABB96AA1D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5559009D-C7E0-453C-AC79-31ABB96AA1D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B60AE799-0118-48D3-88DF-9A1D14FCB09E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B60AE799-0118-48D3-88DF-9A1D14FCB09E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B60AE799-0118-48D3-88DF-9A1D14FCB09E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B60AE799-0118-48D3-88DF-9A1D14FCB09E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B60AE799-0118-48D3-88DF-9A1D14FCB09E} = {2512A799-80D6-4897-954A-D4374023A381}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2C8607F8-5053-4848-A0B7-294717DF3C9D}
