@@ -55,7 +55,7 @@ public static class UserState
     }
 
     private static string GetUsername(ISelectorBuilder get)
-        => $"{get.Value(FirstName)}_{get.Value(LastName)}";
+        => $"{await get.GetAsync(FirstName)}_{await get.GetAsync(LastName)}";
 }
 ```
 Here we have defined two `Atom<T>` of state with default values. Later in this demo we will use these keys to get and fetch data. 
