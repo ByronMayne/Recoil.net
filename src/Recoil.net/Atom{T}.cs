@@ -1,6 +1,8 @@
-﻿using RecoilNet.State;
+﻿using RecoilNet.Effects;
+using RecoilNet.State;
 using System.Diagnostics;
 using System.Windows.Input;
+using System.Windows.Media.Effects;
 
 namespace RecoilNet
 {
@@ -14,35 +16,46 @@ namespace RecoilNet
 		private readonly Func<IRecoilStore?, Task<T?>> m_defaultValueProvider;
 
 		/// <summary>
+		/// Gets the list of effects that are applied to the atom
+		/// </summary>
+		public IReadOnlyList<IAtomEffect<T>> Effects { get; }
+
+		/// <summary>
 		/// Initializes a new instance of an Atom using whatever the default value is
 		/// </summary>
 		/// <param name="key"></param>
-		public Atom(string key) : this(key, default(T))
-		{}
+		public Atom(string key, params IAtomEffect<T>[] effects) : this(key, default(T))
+		{
+			Effects = effects ?? Array.Empty<IAtomEffect<T>>();
+		}
 
 		/// <summary>
 		/// Initializes a new atom using a set defalut value
 		/// </summary>
 		/// <param name="key"></param>
 		/// <param name="defaultValue"></param>
-		public Atom(string key, T? defaultValue) : base(key, true)
-		{
-			// Hard coded value
+		public Atom(string key, T? defaultValue, params IAtomEffect<T>[] effects) : base(key, true)
+{
+			Effects = effects ?? Array.Empty<IAtomEffect<T>>();
 			m_defaultValueProvider = (_) => Task.FromResult(defaultValue);
 		}
 
 		/// <inheritdoc cref="RecoilValue{T}"/>
-		public Atom(string key, Atom<T> atom) : base(key, true)
+		public Atom(string key, Atom<T> atom, params IAtomEffect<T>[] effects) : base(key, true)
 		{
 			ArgumentNullException.ThrowIfNull(atom);
+
+			Effects = effects ?? Array.Empty<IAtomEffect<T>>();
 			m_defaultValueProvider = atom.GetValueAsync;
 			m_dependents.Add(atom);
 		}
 
 		/// <inheritdoc cref="RecoilValue{T}"/>
-		public Atom(string key, Selector<T> defaultValue) : base(key, true)
+		public Atom(string key, Selector<T> defaultValue, params IAtomEffect<T>[] effects) : base(key, true)
 		{
 			ArgumentNullException.ThrowIfNull(defaultValue);
+
+			Effects = effects ?? Array.Empty<IAtomEffect<T>>();
 			m_defaultValueProvider = defaultValue.GetValueAsync;
 			m_dependents.Add(defaultValue);
 		}

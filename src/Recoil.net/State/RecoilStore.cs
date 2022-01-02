@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media;
+﻿using RecoilNet.Effects;
 
 namespace RecoilNet.State
 {
 	/// <summary>
 	/// THe 
 	/// </summary>
-	public class RecoilStore : IRecoilStore
+	public sealed class RecoilStore : IRecoilStore
 	{
 		private readonly IDictionary<string, RecoilValue> m_objects;
 		private readonly IDictionary<string, object?> m_values;
-		
+
 
 		/// <inheritdoc cref="IRecoilStore"/>
 		public IList<RecoilState> States { get; }
@@ -42,9 +36,11 @@ namespace RecoilNet.State
 		{
 			TrackObject(recoilValue);
 
+			T? previousValue = default(T);
+
 			if (HasValue<T>(recoilValue))
 			{
-				T? previousValue = GetValue<T>(recoilValue);
+				previousValue = GetValue<T>(recoilValue);
 
 				if (EqualityComparer<T>.Default.Equals(previousValue, value))
 				{
@@ -52,6 +48,15 @@ namespace RecoilNet.State
 					return;
 				}
 
+			}
+
+			// Invoke effects 
+			if (recoilValue is Atom<T> asAtom)
+			{
+				foreach (IAtomEffect<T> effect in asAtom.Effects)
+				{
+					effect.OnSet(value, previousValue, false);
+				}
 			}
 
 			// Set it 
@@ -66,9 +71,9 @@ namespace RecoilNet.State
 			HashSet<RecoilValue> dependents = new HashSet<RecoilValue>();
 			GetDepdendents(rootChange, dependents);
 
-			foreach(RecoilState state in States)
+			foreach (RecoilState state in States)
 			{
-				if(rootChange == state.RecoilValue)
+				if (rootChange == state.RecoilValue)
 				{
 					await state.ValueChangedAsync(this, m_values[rootChange.Key]);
 				}
@@ -156,10 +161,14 @@ namespace RecoilNet.State
 
 		/// <inheritdoc cref="IRecoilStore"/>
 		public RecoilState<T> UseState<T>(Atom<T> atom)
-			=> new RecoilState<T>(atom, this);
+		{
+			return new RecoilState<T>(atom, this);
+		}
 
 		/// <inheritdoc cref="IRecoilStore"/>
 		public RecoilState<T> UseState<T>(Selector<T> selector)
-			=> new RecoilState<T>(selector, this);
+		{
+			return new RecoilState<T>(selector, this);
+		}
 	}
 }
