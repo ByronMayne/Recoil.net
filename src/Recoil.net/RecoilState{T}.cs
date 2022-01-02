@@ -102,9 +102,7 @@ namespace RecoilNet
 		protected override Task OnValueChangedAsync(IRecoilStore store, object? newValue)
 		{
 			m_value = (T?)newValue;
-			RaisePropertyChanged(nameof(Value));
-			RaisePropertyChanged(nameof(HasValue));
-			ValueChanged?.Invoke(this, m_value);
+			RaiseValueChanged();
 			return Task.CompletedTask;
 		}
 
@@ -112,7 +110,13 @@ namespace RecoilNet
 		protected override async Task OnDependentChangedAsync(IRecoilStore store, RecoilValue dependentValue)
 		{
 			m_value = await m_recoilValue.GetValueAsync(m_store);
+			RaiseValueChanged();
+		}
+
+		private void RaiseValueChanged()
+		{
 			RaisePropertyChanged(nameof(Value));
+			RaisePropertyChanged(nameof(HasValue));
 		}
 	}
 }
