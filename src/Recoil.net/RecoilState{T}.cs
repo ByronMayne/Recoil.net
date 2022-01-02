@@ -1,4 +1,6 @@
 ﻿using RecoilNet.State;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace RecoilNet
@@ -10,51 +12,13 @@ namespace RecoilNet
 	/// <typeparam name="T">The type of the value being held</typeparam>
 	public sealed class RecoilState<T> : RecoilState
 	{
-		public class ValuePropertyDescriptor : PropertyDescriptor
-		{
-			public ValuePropertyDescriptor() : base("Value", null)
-			{
-				ComponentType = typeof(RecoilState<T>);
-				IsReadOnly = false;
-				PropertyType = typeof(T);
-			}
-
-			public override Type ComponentType { get; }
-			public override bool IsReadOnly { get; }
-			public override Type PropertyType { get; }
-
-
-			public override bool CanResetValue(object component)
-			{
-				return true;
-			}
-
-			public override object? GetValue(object? component)
-			{
-				if (typeof(T) == typeof(string))
-				{
-
-					return "String Value";
-				}
-				return default(T);
-			}
-
-			public override void ResetValue(object component)
-			{ }
-
-			public override void SetValue(object? component, object? value)
-			{ }
-
-			public override bool ShouldSerializeValue(object component)
-			{
-				return false;
-			}
-		}
-
-		private const string VALUE_PROPERTY_NAME = "Value";
-
 		private T? m_value;
 		private RecoilValue<T> m_recoilValue;
+
+		/// <summary>
+		/// Raised whenever the value of this state changes 
+		/// </summary>
+		public event EventHandler<T?>? ValueChanged; 
 
 		/// <summary>
 		/// Gets or sets the value of th recoil state. It should be noted that setting the value 
@@ -67,14 +31,19 @@ namespace RecoilNet
 			{
 				m_value = value; // set it for now but it will be overriden later 
 				m_recoilValue.SetValue(m_store, value);
-				IsLoading = true;
+				State = RecoilValueState.Loading;
 			}
 		}
 
 		/// <summary>
+		/// Gets if this recoil state currently has a value.
+		/// </summary>
+		public bool HasValue => m_value != null;
+
+		/// <summary>
 		/// Gets if the value is currently being calculated 
 		/// </summary>
-		public bool IsLoading { get; private set; }
+		public RecoilValueState State { get; private set; }
 
 		/// <summary>
 		/// Creates a new Atom Accessor with the getter and setter defined.
@@ -88,14 +57,18 @@ namespace RecoilNet
 			// Load the default value 
 			Task.Run(async () =>
 			{
-				IsLoading = true;
+				State = RecoilValueState.Loading;
 				try
 				{
 					m_value = await m_recoilValue.GetValueAsync(store);
 				}
+				catch (Exception)
+				{
+					State = RecoilValueState.Error;
+				}
 				finally
 				{
-					IsLoading = false;
+					State = RecoilValueState.Loaded;
 				}
 				if (!EqualityComparer<T>.Default.Equals(m_value, default(T)))
 				{
@@ -122,6 +95,7 @@ namespace RecoilNet
 			}
 
 			RaisePropertyChanged(nameof(Value));
+			RaisePropertyChanged(nameof(HasValue));
 		}
 
 		/// <inheritdoc cref="RecoilState"/>
@@ -129,6 +103,8 @@ namespace RecoilNet
 		{
 			m_value = (T?)newValue;
 			RaisePropertyChanged(nameof(Value));
+			RaisePropertyChanged(nameof(HasValue));
+			ValueChanged?.Invoke(this, m_value);
 			return Task.CompletedTask;
 		}
 
