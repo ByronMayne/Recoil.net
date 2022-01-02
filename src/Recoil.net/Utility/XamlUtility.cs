@@ -1,11 +1,5 @@
 ﻿using RecoilNet.State;
-using RecoilNet.Utility;
-using RecoilNet;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
 using System.Windows;
 
 namespace RecoilNet.Utility
@@ -23,9 +17,16 @@ namespace RecoilNet.Utility
 			ArgumentNullException.ThrowIfNull(element);
 
 			RecoilRoot? root = element.FindTypeInAncestors<RecoilRoot>();
-			return root != null
-				? root.Store
-				: throw ErrorFactory.NoRecoilRootFound(element);
+
+			if (root == null)
+			{
+				// During design mode we don't want to throw exceptions
+				return DesignerProperties.GetIsInDesignMode(element)
+					? new RecoilStore()
+					: throw ErrorFactory.NoRecoilRootFound(element);
+			}
+
+			return root.Store;
 		}
 	}
 }
