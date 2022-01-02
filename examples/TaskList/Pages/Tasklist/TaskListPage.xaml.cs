@@ -10,8 +10,6 @@ namespace TaskList.Pages.Tasklist
 	{
 		public TaskListPage()
 		{
-			this.UseRecoilViewModel<TaskListViewModel>();
-
 			InitializeComponent();
 		}
 	}

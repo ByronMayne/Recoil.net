@@ -4,67 +4,38 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:TaskList.Pages.Tasklist" 
-      xmlns:recoil="clr-namespace:RecoilNet;assembly=Recoil.net"
+      xmlns:data="clr-namespace:TaskList.Data"
+      xmlns:recoil="clr-namespace:RecoilNet;assembly=Recoil.net" xmlns:components="clr-namespace:TaskList.Components"
       mc:Ignorable="d" 
-      d:DesignHeight="800" d:DesignWidth="500"
+      d:DesignHeight="800" d:DesignWidth="1200"
       d:DataContext="{d:DesignInstance Type=local:TaskListViewModel, IsDesignTimeCreatable=False}"
       Title="Tasks">
-    <Grid>
-        <DockPanel LastChildFill="True">
-            <TextBlock 
+    <DockPanel>
+        <TextBlock 
             DockPanel.Dock="Top"
             Background="Purple" 
             FontSize="30" 
             TextAlignment="Left"
             Padding="22"
             TextWrapping="Wrap"
-            Foreground="White">Redux Fundamentals Example</TextBlock>
-
-            <StackPanel DockPanel.Dock="Top" HorizontalAlignment="Stretch" >
-                <StackPanel Orientation="Horizontal"  HorizontalAlignment="Stretch" >
-                    <TextBlock Text="First Name: "/>
-                    <TextBox Text="{Binding FirstName.Value, UpdateSourceTrigger=PropertyChanged}" Width="250" />
-                </StackPanel>
-                <StackPanel Orientation="Horizontal"  HorizontalAlignment="Stretch">
-                    <TextBlock Text="Last Name: "/>
-                    <TextBox Text="{Binding LastName.Value, UpdateSourceTrigger=PropertyChanged}"  Width="250" />
-                </StackPanel>
-                <StackPanel Orientation="Horizontal"  HorizontalAlignment="Stretch" >
-                    <TextBlock Text="Cl Number: "/>
-                    <TextBox Text="{Binding ChangelistNumber.Value, UpdateSourceTrigger=PropertyChanged}" Width="250" />
-                </StackPanel>
-
-                <TextBlock Text="Summary: "/>
-                <TextBox HorizontalAlignment="Stretch" Height="120"  Text="{Binding ChangelistSummary.Value, UpdateSourceTrigger=PropertyChanged}" >
-                </TextBox>
-            </StackPanel>
-
-            <StackPanel DockPanel.Dock="Top">
-                <TextBlock Text="{Binding ChangelistDescription.Value}"/>
-            </StackPanel>
-
-            <!-- Options -->
-            <StackPanel DockPanel.Dock="Bottom" Height="200">
-                <Rectangle Height="1" HorizontalAlignment="Stretch" Fill="Gray"/>
-                <StackPanel Orientation="Horizontal">
-                    <StackPanel>
-                        <TextBlock>Actions</TextBlock>
-                        <Button>Mark All Complete</Button>
-                        <Button>Clear Completed</Button>
-
-                    </StackPanel>
-                    <StackPanel>
-
-                    </StackPanel>
-                    <StackPanel>
-
-                    </StackPanel>
-                </StackPanel>
-            </StackPanel>
-            <!-- Content -->
-            <StackPanel DockPanel.Dock="Top">
-
-            </StackPanel>
-        </DockPanel>
-    </Grid>
+            Foreground="White">Recoil Task List</TextBlock>
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="4"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <!-- Task List -->
+            <DockPanel Grid.Column="0">
+                <components:TaskControls DockPanel.Dock="Bottom" Height="30" />
+                <components:TaskList DockPanel.Dock="Top" VerticalAlignment="Stretch"/>
+            </DockPanel>
+            <!-- Splitter -->
+            <GridSplitter Grid.Column="1" Background="#FFE2E2E2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+            <!-- Task Editor -->
+            <components:TaskEditor Grid.Column="2">
+                
+            </components:TaskEditor>
+        </Grid>
+    </DockPanel>
 </Page>
