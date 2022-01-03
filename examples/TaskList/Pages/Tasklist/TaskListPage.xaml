@@ -11,14 +11,16 @@
       d:DataContext="{d:DesignInstance Type=local:TaskListViewModel, IsDesignTimeCreatable=False}"
       Title="Tasks">
     <DockPanel>
-        <TextBlock 
-            DockPanel.Dock="Top"
-            Background="Purple" 
-            FontSize="30" 
-            TextAlignment="Left"
-            Padding="22"
-            TextWrapping="Wrap"
-            Foreground="White">Recoil Task List</TextBlock>
+        <Grid DockPanel.Dock="Top">
+            <TextBlock 
+                Background="Purple" 
+                FontSize="30" 
+                TextAlignment="Left"
+                Padding="22"
+                TextWrapping="Wrap"
+                Foreground="White">Recoil Task List</TextBlock>
+            <components:TaskFilterBox Width="150" Height="25"  HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10"/>
+        </Grid>
         <Grid DockPanel.Dock="Top">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*"/>

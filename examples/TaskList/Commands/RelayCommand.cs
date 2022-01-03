@@ -12,7 +12,14 @@ namespace TaskList.Commands
         private readonly Predicate<object?>? m_canExecute;
         private readonly Action<object?> m_execute;
 
-        public event EventHandler? CanExecuteChanged;
+        ///<summary>
+        ///Occurs when changes occur that affect whether or not the command should execute.
+        ///</summary>
+        public event EventHandler? CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
 
         public RelayCommand(Action<object?> execute) : this(null, execute)
         { }

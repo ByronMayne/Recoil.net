@@ -29,7 +29,7 @@ namespace TaskList.ViewModel
 		{
 			Title = taskData.Title;
 			Description = taskData.Description;
-			Tags = new List<string>(taskData.Tags);
+			Tags =  new List<string>(taskData.Tags?? Array.Empty<string>());
 		}
 
 		public TaskData ToTaskData()

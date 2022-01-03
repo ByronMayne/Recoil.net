@@ -25,7 +25,7 @@ namespace TaskList.Components
 		{
 			DataContext = this;
 
-			Tasks = this.UseRecoilState(TasksState.Tasks);
+			Tasks = this.UseRecoilState(TasksState.FilteredTasks);
 			SelectedIndex = this.UseRecoilState(TasksState.SelectedTaskIndex);
 
 			InitializeComponent();
