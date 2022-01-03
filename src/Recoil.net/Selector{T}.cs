@@ -12,7 +12,6 @@ namespace RecoilNet
 	/// derived state as the output of passing state to a pure function 
 	/// that modifies the given state in some way.
 	/// </summary>
-	[DebuggerDisplay("Selector<{typeof(T).Name}>: {Key}")]
 	public class Selector<T> : RecoilValue<T>
 	{
 		public delegate Task<T?> ValueGetter(IValueProvider asyncBuilder);
@@ -41,7 +40,7 @@ namespace RecoilNet
 		}
 
 		/// <inheritdoc cref="RecoilValue{T}"/>
-		public override void SetValue(IRecoilStore? recoilStore, T? value)
+		public override async Task SetValueAsync(IRecoilStore? recoilStore, T? value)
 		{
 			if (recoilStore == null)
 			{
@@ -53,7 +52,7 @@ namespace RecoilNet
 				throw ErrorFactory.AssigningValueToNonMutableType(this);
 			}
 
-			m_setter(recoilStore, value);
+			await m_setter(recoilStore, value);
 		}
 
 		/// <inheritdoc cref="RecoilValue{T}"/>
@@ -62,5 +61,9 @@ namespace RecoilNet
 			ValueProvider<T> valueProvider = new ValueProvider<T>(recoilStore, this);
 			return await m_getter(valueProvider);
 		}
+
+		/// <inheritdoc cref="RecoilValue"/>
+		internal override string RenderDebug()
+			=> $"Selector<{typeof(T).Name}>: {Key}";
 	}
 }

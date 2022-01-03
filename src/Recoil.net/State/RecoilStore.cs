@@ -31,8 +31,22 @@ namespace RecoilNet.State
 			return new RecoilState<T>(recoilValue, this);
 		}
 
+		public async Task SetValueAsync<T>(RecoilValue<T> recoilValue, T? value)
+		{
+			SetValueInternal(recoilValue, value);
+			await NotifyListenersAsync(recoilValue);
+		}
+
+
 		/// <inheritdoc cref="IRecoilStore"/>
 		public void SetValue<T>(RecoilValue<T> recoilValue, T? value)
+		{
+			SetValueInternal(recoilValue, value);
+			// Notify on background job 
+			Task.Run(() => NotifyListenersAsync(recoilValue));
+		}
+
+		private void SetValueInternal<T>(RecoilValue<T> recoilValue, T? value)
 		{
 			TrackObject(recoilValue);
 
@@ -61,12 +75,9 @@ namespace RecoilNet.State
 
 			// Set it 
 			m_values[recoilValue.Key] = value;
-
-			// Push update notifications onto another thread
-			Task.Run(() => NotifyListenersAsync(recoilValue));
 		}
 
-		private async void NotifyListenersAsync(RecoilValue rootChange)
+		private async Task NotifyListenersAsync(RecoilValue rootChange)
 		{
 			HashSet<RecoilValue> dependents = new HashSet<RecoilValue>();
 			GetDepdendents(rootChange, dependents);

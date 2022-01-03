@@ -10,7 +10,7 @@ namespace RecoilNet
 	/// Atoms are units of state. They're updateable and subscribable: 
 	/// when an atom is updated, each subscribed component is re-rendered with the new value. 
 	/// </summary>
-	[DebuggerDisplay("Atom<{typeof(T).Name}>: {Key}")]
+
 	public class Atom<T> : RecoilValue<T>
 	{
 		private readonly Func<IRecoilStore?, Task<T?>> m_defaultValueProvider;
@@ -74,5 +74,9 @@ namespace RecoilNet
 			}
 			return storeValue;
 		}
+
+		/// <inheritdoc cref="RecoilValue"/>
+		internal override string RenderDebug()
+			=> $"Atom<{typeof(T).Name}>: {Key}";
 	}
 }

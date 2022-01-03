@@ -45,7 +45,7 @@ namespace RecoilNet
 			{
 				return;
 			}
-			InvokeOnMain(() => PropertyChanged(this, new PropertyChangedEventArgs(propertyName)));
+			PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 		}
 
 		/// <summary>
@@ -55,7 +55,9 @@ namespace RecoilNet
 		{
 			if (m_syncContext != null)
 			{
-				m_syncContext.Post(_ =>
+				// We use send instead of 'Post' as we need to wait for the 
+				// notifcation to be posted
+				m_syncContext.Send(_ =>
 				{
 					action();
 				}, null);

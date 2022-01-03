@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace RecoilNet
 {
@@ -10,6 +11,7 @@ namespace RecoilNet
 	/// the <see cref="IRecoilStore"/> instance that holds it's value.
 	/// </summary>
 	/// <typeparam name="T">The type of the value being held</typeparam>
+	[DebuggerDisplay("{RecoilValue.RenderDebug()}")]
 	public sealed class RecoilState<T> : RecoilState
 	{
 		private T? m_value;
@@ -30,7 +32,7 @@ namespace RecoilNet
 			set
 			{
 				m_value = value; // set it for now but it will be overriden later 
-				m_recoilValue.SetValue(m_store, value);
+				Task.Run(() => m_recoilValue.SetValueAsync(m_store, value));
 				State = RecoilValueState.Loading;
 			}
 		}
@@ -94,8 +96,7 @@ namespace RecoilNet
 				m_store.States.Add(this);
 			}
 
-			RaisePropertyChanged(nameof(Value));
-			RaisePropertyChanged(nameof(HasValue));
+			RaiseValueChanged();
 		}
 
 		/// <inheritdoc cref="RecoilState"/>
@@ -114,14 +115,11 @@ namespace RecoilNet
 		}
 
 		private void RaiseValueChanged()
-		{
-			if (ValueChanged != null)
+			=> InvokeOnMain(() =>
 			{
-				InvokeOnMain(() => ValueChanged(this, m_value));
-			}
-			// Already invoked on main
-			RaisePropertyChanged(nameof(Value));
-			RaisePropertyChanged(nameof(HasValue));
-		}
+				ValueChanged?.Invoke(this, m_value);
+				RaisePropertyChanged(nameof(Value));
+				RaisePropertyChanged(nameof(HasValue));
+			});
 	}
 }

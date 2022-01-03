@@ -1,6 +1,7 @@
 ﻿using RecoilNet.Internal;
 using RecoilNet.State;
 using RecoilNet.Utility;
+using System.Diagnostics;
 
 namespace RecoilNet
 {
@@ -33,7 +34,7 @@ namespace RecoilNet
 		/// </summary>
 		/// <param name="recoilStore">The store to assign the value</param>
 		/// <param name="value">The value to set</param>
-		public virtual void SetValue(IRecoilStore? recoilStore, T? value)
+		public virtual async Task SetValueAsync(IRecoilStore? recoilStore, T? value)
 		{
 			if (recoilStore == null)
 			{
@@ -44,7 +45,7 @@ namespace RecoilNet
 			{
 				throw ErrorFactory.AssigningValueToNonMutableType(this);
 			}
-			recoilStore.SetValue<T>(this, value);
+			await recoilStore.SetValueAsync<T>(this, value);
 		}
 	}
 }

@@ -45,12 +45,21 @@
 		void ResetValue<T>(RecoilValue<T> recoilObject);
 
 		/// <summary>
-		/// Sets the value of the <see cref="RecoilValue{T}"/> in the store 
+		/// Sets the value of the <see cref="RecoilValue{T}"/> in the store and processes 
+		/// all the update events on a background job
 		/// </summary>
 		/// <typeparam name="T">The values type</typeparam>
 		/// <param name="recoilObject">The atom to set</param>
 		/// <param name="value">The value to set it too</param>
 		void SetValue<T>(RecoilValue<T> recoilObject, T? value);
+
+		/// <summary>
+		/// Sets the value of the store and awaits for all the update events to be fired.
+		/// </summary>
+		/// <typeparam name="T">The values type</typeparam>
+		/// <param name="recoilObject">The atom to set</param>
+		/// <param name="value">The value to set it too</param>
+		Task SetValueAsync<T>(RecoilValue<T> recoilValue, T? value);
 
 		/// <summary>
 		/// Creates a new <see cref="RecoilState"/> from the current store

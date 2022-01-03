@@ -1,11 +1,13 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace RecoilNet
 {
 	/// <summary>
 	/// Base class that contains logic shared amoung recoile types
 	/// </summary>
-	public class RecoilValue : IEqualityComparer<RecoilValue>
+	[DebuggerDisplay("{RenderDebug()}")]
+	public abstract class RecoilValue : IEqualityComparer<RecoilValue>
 	{
 		public class EqualityComparer : IEqualityComparer<RecoilValue>
 		{
@@ -79,5 +81,10 @@ namespace RecoilNet
 
 		public int GetHashCode([DisallowNull] RecoilValue obj)
 			=> obj.GetHashCode();
+
+		/// <summary>
+		/// Used to render the tooltip for debugger
+		/// </summary>
+		internal abstract string RenderDebug();
 	}
 }
