@@ -1,20 +1,8 @@
 ﻿using RecoilNet;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using TaskList.Data;
 using TaskList.State;
+using TaskList.ViewModel;
 
 namespace TaskList.Components
 {
@@ -27,11 +15,22 @@ namespace TaskList.Components
 
 		public TaskEditor()
 		{
-			DataContext = this;
-
 			SelectedTask = this.UseRecoilState(TasksState.SelectedTask);
+			SelectedTask.ValueChanged += OnSelectedTaskChanged;
 
 			InitializeComponent();
+		}
+
+		private void OnSelectedTaskChanged(object? sender, TaskData? e)
+		{
+			DataContext = e == null
+				? null
+				: new TaskEditorViewModel(e);
+		}
+
+		private void ApplyChanges(object sender, System.Windows.RoutedEventArgs e)
+		{
+			SelectedTask.Value = ((TaskEditorViewModel)DataContext).ToTaskData();
 		}
 	}
 }

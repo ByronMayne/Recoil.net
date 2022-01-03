@@ -18,7 +18,7 @@ namespace RecoilNet
 		/// <summary>
 		/// Raised whenever the value of this state changes 
 		/// </summary>
-		public event EventHandler<T?>? ValueChanged; 
+		public event EventHandler<T?>? ValueChanged;
 
 		/// <summary>
 		/// Gets or sets the value of th recoil state. It should be noted that setting the value 
@@ -115,6 +115,11 @@ namespace RecoilNet
 
 		private void RaiseValueChanged()
 		{
+			if (ValueChanged != null)
+			{
+				InvokeOnMain(() => ValueChanged(this, m_value));
+			}
+			// Already invoked on main
 			RaisePropertyChanged(nameof(Value));
 			RaisePropertyChanged(nameof(HasValue));
 		}

@@ -23,5 +23,11 @@ namespace TaskList.Data
 		/// Gets if the task has been completed 
 		/// </summary>
 		public bool IsComplete { get; init; }
+
+
+		public TaskData()
+		{
+			Tags = new List<string>();
+		}
 	}
 }

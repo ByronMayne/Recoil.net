@@ -45,20 +45,26 @@ namespace RecoilNet
 			{
 				return;
 			}
+			InvokeOnMain(() => PropertyChanged(this, new PropertyChangedEventArgs(propertyName)));
+		}
 
+		/// <summary>
+		/// Invokes the delegate on the main thread
+		/// </summary>
+		protected void InvokeOnMain(Action action)
+		{
 			if (m_syncContext != null)
 			{
 				m_syncContext.Post(_ =>
 				{
-					PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+					action();
 				}, null);
 			}
 			else
 			{
-				PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+				action();
 			}
 		}
-
 
 		/// <summary>
 		/// Invoked whenver the <see cref="IRecoilStore"/> instance 
