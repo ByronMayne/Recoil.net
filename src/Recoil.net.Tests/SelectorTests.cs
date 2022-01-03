@@ -19,7 +19,7 @@ namespace Recoil.net.Tests
 		[Test]
 		public void Create_WithNulBuilder_ThrowsArgumentNullException()
 
-			=> Assert.Throws<ArgumentNullException>(() => new Selector<string>("KEY", builder:null),
+			=> Assert.Throws<ArgumentNullException>((TestDelegate)(() => new Selector<string>("KEY", getter:(Selector<string>.ValueGetter?)null)),
 				   "We should have received an exception for the null key");
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
 
