@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using RecoilNet.State;
+using System.Dynamic;
+using System.Windows;
 
 namespace TaskList
 {
@@ -7,9 +9,15 @@ namespace TaskList
 	/// </summary>
 	public partial class App : Application
 	{
+		public IRecoilStore RecoilStore
+		{
+			get => (IRecoilStore)Resources[nameof(RecoilStore)];
+			set => Resources[nameof(RecoilStore)] = value;
+		}
+
 		public App()
 		{
-
+			RecoilStore = new RecoilStore();
 		}
 	}
 }

@@ -9,7 +9,8 @@
         x:Name="Self"
         d:DataContext="{d:DesignInstance local:MainWindow, IsDesignTimeCreatable=True}"
         Title="MainWindow" Height="800" Width="500">
-    <recoil:RecoilRoot>
+    <!-- The RecoilStoreValue is set in the App.xaml.cs's constructor -->
+    <recoil:RecoilRoot Store="{StaticResource RecoilStore}">
         <Frame Source="/Pages/TaskList/TaskListPage.xaml" />
     </recoil:RecoilRoot>
 </Window>
