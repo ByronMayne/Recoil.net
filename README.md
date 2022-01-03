@@ -46,12 +46,12 @@ public static class UserState
 
     static UserState
     {
-        // Recoil.CreateAtom<T>(string: key, defaultValue: T | Atom<T> | Selector<T>)
-        FirstName = Recoil.CreateAtom<string>("User.FirstName", "John");
-        LastName = Recoil.CreateAtom<string>("User.LastName", "Smith");
+        // new Atom<T>(string: key, defaultValue: T | Atom<T> | Selector<T>)
+        FirstName = new Atom<string>("User.FirstName", "John");
+        LastName = new Atom<string>("User.LastName", "Smith");
 
-        // Recoil.CreateAtom<T>(string: key, ISelectorBuilder:get)
-        Username = Recoil.CreateSelector<string>("User.Username", GetUsername);
+        // new Selector<T>(string: key, ISelectorBuilder:get)
+        Username = new Selector<string>("User.Username", GetUsername);
     }
 
     private static string GetUsername(ISelectorBuilder get)
@@ -161,3 +161,9 @@ public class ProfileViewModel
 }
 ```
 It's the same case with using code behind where we don't have to use `INotifyPropertyChanged` to get the values to update with binding.
+
+
+## More Information 
+
+* [Atoms](./Docs/Atoms.md)
+* [Selectors](./Docs/Selectors.md)
