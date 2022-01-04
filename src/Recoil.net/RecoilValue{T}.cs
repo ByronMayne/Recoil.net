@@ -34,18 +34,6 @@ namespace RecoilNet
 		/// </summary>
 		/// <param name="recoilStore">The store to assign the value</param>
 		/// <param name="value">The value to set</param>
-		public virtual async Task SetValueAsync(IRecoilStore? recoilStore, T? value)
-		{
-			if (recoilStore == null)
-			{
-				return;
-			}
-
-			if (!IsMutable)
-			{
-				throw ErrorFactory.AssigningValueToNonMutableType(this);
-			}
-			await recoilStore.SetValueAsync<T>(this, value);
-		}
+		public abstract Task SetValueAsync(IRecoilStore? recoilStore, T? value);
 	}
 }
