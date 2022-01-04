@@ -1,4 +1,4 @@
-namespace RecoilNet.State
+﻿namespace RecoilNet.State
 {
 	public delegate Task RecoilValueChangedDelegate(IRecoilStore store, IList<RecoilValue> changedValues);
 
@@ -8,9 +8,23 @@ namespace RecoilNet.State
 	public interface IRecoilStore
 	{
 		/// <summary>
-		/// Gets the list of states that are being tracked by this store
+		/// Gets the unique id for the given store
 		/// </summary>
-		IList<RecoilState> States { get; }
+		int Id { get; }
+
+		/// <summary>
+		/// Invoked to add a state as a consumer to the given store
+		/// </summary>
+		/// <typeparam name="T">The value type of the state</typeparam>
+		/// <param name="state">The state instance to add</param>
+		void AddState<T>(RecoilState<T> state);
+
+		/// <summary>
+		/// Invoked to remove a state as a consumer to the given store
+		/// </summary>
+		/// <typeparam name="T">The value type of the state</typeparam>
+		/// <param name="state">The state instance to remove</param>
+		void RemoveState<T>(RecoilState<T> state);
 
 		/// <summary>
 		/// Gets the value of the <see cref="RecoilValue{T}"/> 
