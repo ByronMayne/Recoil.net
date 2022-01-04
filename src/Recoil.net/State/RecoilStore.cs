@@ -1,4 +1,4 @@
-﻿using RecoilNet.Effects;
+using RecoilNet.Effects;
 
 namespace RecoilNet.State
 {
@@ -110,7 +110,7 @@ namespace RecoilNet.State
 		}
 
 		/// <inheritdoc cref="IRecoilStore"/>
-		public T? GetValue<T>(RecoilValue<T> recoilObject)
+		public T? GetValue<T>(Atom<T> recoilObject)
 		{
 			ArgumentNullException.ThrowIfNull(recoilObject);
 
@@ -121,13 +121,13 @@ namespace RecoilNet.State
 		}
 
 		/// <inheritdoc cref="IRecoilStore"/>
-		public bool HasValue<T>(RecoilValue<T>? recoilObject)
+		public bool HasValue<T>(Atom<T>? recoilObject)
 		{
 			return recoilObject != null && m_values.ContainsKey(recoilObject.Key);
 		}
 
 		/// <inheritdoc cref="IRecoilStore"/>
-		public bool TryGetValue<T>(RecoilValue<T> recoilObject, out T? value)
+		public bool TryGetValue<T>(Atom<T> recoilObject, out T? value)
 		{
 			ArgumentNullException.ThrowIfNull(recoilObject);
 			value = default;
@@ -141,7 +141,7 @@ namespace RecoilNet.State
 		}
 
 		/// <inheritdoc cref="IRecoilStore"/>
-		public void ResetValue<T>(RecoilValue<T> recoilObject)
+		public void ResetValue<T>(Atom<T> recoilObject)
 		{
 			TrackObject(recoilObject);
 			if (HasValue(recoilObject))

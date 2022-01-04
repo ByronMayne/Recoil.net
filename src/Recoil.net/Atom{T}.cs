@@ -1,5 +1,6 @@
 ﻿using RecoilNet.Effects;
 using RecoilNet.State;
+using RecoilNet.Utility;
 using System.Diagnostics;
 using System.Windows.Input;
 using System.Windows.Media.Effects;
@@ -35,7 +36,7 @@ namespace RecoilNet
 		/// <param name="key"></param>
 		/// <param name="defaultValue"></param>
 		public Atom(string key, T? defaultValue, params IAtomEffect<T>[] effects) : base(key, true)
-{
+		{
 			Effects = effects ?? Array.Empty<IAtomEffect<T>>();
 			m_defaultValueProvider = (_) => Task.FromResult(defaultValue);
 		}
@@ -76,7 +77,22 @@ namespace RecoilNet
 		}
 
 		/// <inheritdoc cref="RecoilValue"/>
+		public override async Task SetValueAsync(IRecoilStore? recoilStore, T? value)
+		{
+			if (recoilStore == null)
+			{
+				return;
+			}
+
+			if (!IsMutable)
+			{
+				throw ErrorFactory.AssigningValueToNonMutableType(this);
+			}
+			await recoilStore.SetValueAsync<T>(this, value);
+		}
+
+		/// <inheritdoc cref="RecoilValue"/>
 		internal override string RenderDebug()
-			=> $"Atom<{typeof(T).Name}>: {Key}";
+				=> $"Atom<{typeof(T).Name}>: {Key}";
 	}
 }
