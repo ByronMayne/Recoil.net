@@ -41,7 +41,8 @@ namespace RecoilNet.Components
 		/// <typeparam name="T">The value type</typeparam>
 		/// <param name="recoilStore">The store that holds the new value</param>
 		/// <param name="changedAtom">The atom that was changed</param>
+		/// <param name="value">The new value that was assigned</param>
 		/// <param name="dependents">The list of atoms and selectors that are dependent on the value being changed.</param>
-		void OnValueChanged<T>(RecoilStore recoilStore, Atom<T> changedAtom, HashSet<RecoilValue> dependents);
+		void OnValueChanged<T>(RecoilStore recoilStore, Atom<T> changedAtom, T? value, HashSet<RecoilValue> dependents);
 	}
 }
