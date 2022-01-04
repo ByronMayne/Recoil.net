@@ -9,11 +9,12 @@ namespace RecoilNet.State
 	/// </summary>
 	public sealed class RecoilStore : IRecoilStore, IDisposable
 	{
+		private static int s_nextId = 0;
 		private readonly IDictionary<string, RecoilValue> m_objects;
 		private readonly IDictionary<string, object?> m_values;
 		private readonly IReadOnlyList<IStoreComponent> m_components;
 
-		private static readonly List<WeakReference<RecoilStore>> s_stores;
+		private static readonly Dictionary<int, WeakReference<RecoilStore>> s_stores;
 		private List<RecoilState> m_states;
 
 		/// <inheritdoc cref="IRecoilStore"/>
@@ -22,12 +23,12 @@ namespace RecoilNet.State
 		/// <summary>
 		/// Contains a weak reference to all the RecoilStores that have been defined.
 		/// </summary>
-		internal static IReadOnlyList<WeakReference<RecoilStore>> Stores
+		internal static IReadOnlyDictionary<int, WeakReference<RecoilStore>> Stores
 			=> s_stores;
 
 		static RecoilStore()
 		{
-			s_stores = new List<WeakReference<RecoilStore>>();
+			s_stores = new Dictionary<int, WeakReference<RecoilStore>>();
 		}
 
 		/// <summary>
@@ -48,8 +49,8 @@ namespace RecoilNet.State
 			m_objects = new Dictionary<string, RecoilValue>();
 			m_values = new Dictionary<string, object?>();
 			m_states = new List<RecoilState>();
-			s_stores.Add(new WeakReference<RecoilStore>(this));
-			Id = s_stores.Count;
+			Id = ++s_nextId;
+			s_stores[Id] = new WeakReference<RecoilStore>(this);
 
 			foreach (IStoreComponent component in m_components)
 			{
@@ -242,24 +243,7 @@ namespace RecoilNet.State
 			m_values.Clear();
 			s_stores.Clear();
 			m_objects.Clear();
-			lock (s_stores)
-			{
-				for (int i = 0; i < m_states.Count; i++)
-				{
-					WeakReference<RecoilStore>? weakStore = Stores[i];
-					if (weakStore.TryGetTarget(out RecoilStore? store))
-					{
-						if (store == this)
-						{
-							s_stores.RemoveAt(i);
-						}
-					}
-					else
-					{
-						s_stores.RemoveAt(i);
-					}
-				}
-			}
+			s_stores.Remove(Id);
 		}
 	}
 }
