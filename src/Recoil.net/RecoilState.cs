@@ -8,7 +8,7 @@ namespace RecoilNet
 	/// the <see cref="IRecoilStore"/> instance that holds it's value.
 	/// </summary>
 	/// <typeparam name="T">The type of the value being held</typeparam>
-	public abstract class RecoilState : INotifyPropertyChanged
+	public abstract class RecoilState : INotifyPropertyChanged, IDisposable
 	{
 		private static readonly PropertyChangedEventArgs s_valueChangedEventArgs;
 
@@ -113,6 +113,22 @@ namespace RecoilNet
 		internal Task DependentChangedAsync(IRecoilStore recoilStore, RecoilValue dependentValue)
 		{
 			return OnDependentChangedAsync(recoilStore, dependentValue);
+		}
+
+		protected virtual void OnDispose()
+		{
+			PropertyChanged = null;
+			m_store = null;
+
+		}
+
+		/// <summary>
+		/// Disposes of this elements resources and cleans up all listeners
+		/// </summary>
+		public void Dispose()
+		{
+			OnDispose();
+			GC.SuppressFinalize(this);
 		}
 	}
 }

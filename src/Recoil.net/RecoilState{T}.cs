@@ -1,7 +1,4 @@
-﻿using RecoilNet.State;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
+using RecoilNet.State;
 using System.Diagnostics;
 
 namespace RecoilNet
@@ -15,7 +12,7 @@ namespace RecoilNet
 	public sealed class RecoilState<T> : RecoilState
 	{
 		private T? m_value;
-		private RecoilValue<T> m_recoilValue;
+		private readonly RecoilValue<T> m_recoilValue;
 
 		/// <summary>
 		/// Raised whenever the value of this state changes 
@@ -114,12 +111,23 @@ namespace RecoilNet
 			RaiseValueChanged();
 		}
 
+		protected override void OnDispose()
+		{
+			m_store?.RemoveState(this);
+			ValueChanged = null;
+			m_value = default;
+			State = RecoilValueState.Disposed;
+			base.OnDispose();
+		}
+
 		private void RaiseValueChanged()
-			=> InvokeOnMain(() =>
-			{
-				ValueChanged?.Invoke(this, m_value);
-				RaisePropertyChanged(nameof(Value));
-				RaisePropertyChanged(nameof(HasValue));
-			});
+		{
+			InvokeOnMain(() =>
+					   {
+						   ValueChanged?.Invoke(this, m_value);
+						   RaisePropertyChanged(nameof(Value));
+						   RaisePropertyChanged(nameof(HasValue));
+					   });
+		}
 	}
 }
