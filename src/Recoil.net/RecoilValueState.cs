@@ -18,6 +18,11 @@
 		/// <summary>
 		/// The value 
 		/// </summary>
-		Error
+		Error,
+
+		/// <summary>
+		/// The instance was cleaned up and removed
+		/// </summary>
+		Disposed,
 	}
 }

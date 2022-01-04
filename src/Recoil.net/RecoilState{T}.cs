@@ -1,4 +1,4 @@
-using RecoilNet.State;
+﻿using RecoilNet.State;
 using System.Diagnostics;
 
 namespace RecoilNet
@@ -79,18 +79,21 @@ namespace RecoilNet
 		/// <inheritdoc cref="RecoilState"/>
 		protected override void OnStoreSet(IRecoilStore? store)
 		{
-			if (m_store == store) return;
+			if (m_store == store)
+			{
+				return;
+			}
 
 			if (m_store != null)
 			{
-				m_store.States.Remove(this);
+				m_store.RemoveState(this);
 			}
 
 			m_store = store;
 
 			if (m_store != null)
 			{
-				m_store.States.Add(this);
+				m_store.AddState(this);
 			}
 
 			RaiseValueChanged();

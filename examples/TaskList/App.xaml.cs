@@ -1,4 +1,5 @@
-﻿using RecoilNet.State;
+﻿using RecoilNet;
+using RecoilNet.State;
 using System.Dynamic;
 using System.Windows;
 
@@ -17,7 +18,10 @@ namespace TaskList
 
 		public App()
 		{
-			RecoilStore = new RecoilStore();
+			RecoilStore = StoreConfigurationBuilder
+				.Default
+				.AddDevelopmentTools()
+				.Build();
 		}
 	}
 }
