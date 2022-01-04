@@ -15,9 +15,8 @@ namespace Recoil.net.DevTools.State
 
 		static InspectorState()
 		{
-			Pages = new Atom<IReadOnlyList<string>>("InspectorState.Pages");
-			ActivePage = new Atom<string>("InspectorState.ActivePage", "/Pages/EventViewerPage");
+			ActivePage = Atom.Create(() => ActivePage, "/pages/EventViewerPage");
+			Pages = Atom.Create(() => Pages, Array.Empty<string>());
 		}
-
 	}
 }

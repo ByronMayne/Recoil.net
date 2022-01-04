@@ -14,7 +14,7 @@
             <TextBlock Text="Please Select a Process" FontSize="23" Foreground="Gray"/>
         </StackPanel>
         <DockPanel Visibility="{Binding Converter={x:Static converters:NullToVisibilityConverter.CollapsedWhenNull}}">
-            <Page/>
+          
         </DockPanel>
     </Grid>
 </UserControl>

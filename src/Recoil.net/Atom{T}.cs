@@ -7,6 +7,7 @@ using System.Windows.Media.Effects;
 
 namespace RecoilNet
 {
+
 	/// <summary>
 	/// Atoms are units of state. They're updateable and subscribable: 
 	/// when an atom is updated, each subscribed component is re-rendered with the new value. 
@@ -14,6 +15,7 @@ namespace RecoilNet
 
 	public class Atom<T> : RecoilValue<T>
 	{
+
 		private readonly Func<IRecoilStore?, Task<T?>> m_defaultValueProvider;
 
 		/// <summary>
@@ -42,23 +44,20 @@ namespace RecoilNet
 		}
 
 		/// <inheritdoc cref="RecoilValue{T}"/>
-		public Atom(string key, Atom<T> atom, params IAtomEffect<T>[] effects) : base(key, true)
-		{
-			ArgumentNullException.ThrowIfNull(atom);
-
-			Effects = effects ?? Array.Empty<IAtomEffect<T>>();
-			m_defaultValueProvider = atom.GetValueAsync;
-			m_dependents.Add(atom);
-		}
+		public Atom(string key, Atom<T> defaultValue, params IAtomEffect<T>[] effects) : this(key, defaultRecoilValue: defaultValue, effects)
+		{ }
 
 		/// <inheritdoc cref="RecoilValue{T}"/>
-		public Atom(string key, Selector<T> defaultValue, params IAtomEffect<T>[] effects) : base(key, true)
+		public Atom(string key, Selector<T> defaultValue, params IAtomEffect<T>[] effects) : this(key, defaultRecoilValue: defaultValue, effects)
+		{ }
+
+		internal Atom(string key, RecoilValue<T> defaultRecoilValue, params IAtomEffect<T>[] effects) : base(key, true)
 		{
-			ArgumentNullException.ThrowIfNull(defaultValue);
+			ArgumentNullException.ThrowIfNull(defaultRecoilValue);
 
 			Effects = effects ?? Array.Empty<IAtomEffect<T>>();
-			m_defaultValueProvider = defaultValue.GetValueAsync;
-			m_dependents.Add(defaultValue);
+			m_defaultValueProvider = defaultRecoilValue.GetValueAsync;
+			m_dependents.Add(defaultRecoilValue);
 		}
 
 		/// <summary>
@@ -94,5 +93,7 @@ namespace RecoilNet
 		/// <inheritdoc cref="RecoilValue"/>
 		internal override string RenderDebug()
 				=> $"Atom<{typeof(T).Name}>: {Key}";
+
+
 	}
 }

@@ -12,7 +12,7 @@ namespace TaskList.State
 	public static class TasksState
 	{
 		public static readonly Atom<string> TaskFilterString;
-		public static readonly Atom<bool> FilterIsCaseSensetive;
+		public static readonly Atom<bool> FilterIsCaseSensitive;
 
 		public static readonly Atom<int> SelectedTaskIndex;
 		public static readonly Atom<IReadOnlyList<TaskData>> Tasks;
@@ -22,20 +22,18 @@ namespace TaskList.State
 
 		static TasksState()
 		{
-			TaskFilterString = new Atom<string>("TaskState.Filter", "");
-			SelectedTaskIndex = new Atom<int>("TaskState.SelectedTaskIndex");
-			FilterIsCaseSensetive = new Atom<bool>("TaskState.Filter.CaseSensetive", false);
-			Tasks = new Atom<IReadOnlyList<TaskData>>("TaskState.Tasks", Array.Empty<TaskData>());
-
-
-			SelectedTask = new Selector<TaskData>("TaskState.SelectedTask", GetSelectedTask, SetSelectedTask);
-			FilteredTasks = new Selector<IReadOnlyList<TaskData>>("TaskState.FilteredTasks", GetFiltredTasks);
+			TaskFilterString = Atom.Create(() => TaskFilterString);
+			SelectedTaskIndex = Atom.Create(() => SelectedTaskIndex);
+			FilterIsCaseSensitive = Atom.Create(() => FilterIsCaseSensitive,false);
+			Tasks = Atom.Create(() => Tasks,Array.Empty<TaskData>());
+			SelectedTask = Selector.Create(() => SelectedTask, GetSelectedTask, SetSelectedTask);
+			FilteredTasks = Selector.Create(() => FilteredTasks, GetFiltredTasks);
 		}
 
 		private static async Task<IReadOnlyList<TaskData>?> GetFiltredTasks(IValueProvider provider)
 		{
 			string? filter = await provider.GetAsync(TaskFilterString);
-			bool caseSensetive = await provider.GetAsync(FilterIsCaseSensetive);
+			bool caseSensetive = await provider.GetAsync(FilterIsCaseSensitive);
 			IReadOnlyList<TaskData>? tasks = await provider.GetAsync(Tasks);
 
 			// no filter just return our other list 
