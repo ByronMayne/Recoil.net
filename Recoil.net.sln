@@ -5,7 +5,7 @@ VisualStudioVersion = 17.1.31911.260
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recoil.net", "src\Recoil.net\Recoil.net.csproj", "{689943C6-6604-4427-ACEA-8CEC0AE7B177}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recoil.net.Tests", "src\Recoil.net.Tests\Recoil.net.Tests.csproj", "{5559009D-C7E0-453C-AC79-31ABB96AA1D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recoil.net.Tests", "src\Recoil.net.Tests\Recoil.net.Tests.csproj", "{5559009D-C7E0-453C-AC79-31ABB96AA1D0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{2512A799-80D6-4897-954A-D4374023A381}"
 EndProject
@@ -15,6 +15,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recoil.net.DevTools", "src\Recoil.net.DevTools\Recoil.net.DevTools.csproj", "{6D2AB196-0F9E-405D-B3C9-50E23441AEA5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Components", "Components", "{8749EAD6-4E2F-4DA2-ABB2-2A9FB00AC912}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recoil.net.Component.DevTools", "src\Recoil.net.Component.DevTools\Recoil.net.Component.DevTools.csproj", "{5D05F42C-A49F-4232-BC09-405E0438D829}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,12 +40,21 @@ Global
 		{B60AE799-0118-48D3-88DF-9A1D14FCB09E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B60AE799-0118-48D3-88DF-9A1D14FCB09E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B60AE799-0118-48D3-88DF-9A1D14FCB09E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D2AB196-0F9E-405D-B3C9-50E23441AEA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D2AB196-0F9E-405D-B3C9-50E23441AEA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D2AB196-0F9E-405D-B3C9-50E23441AEA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D2AB196-0F9E-405D-B3C9-50E23441AEA5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D05F42C-A49F-4232-BC09-405E0438D829}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D05F42C-A49F-4232-BC09-405E0438D829}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D05F42C-A49F-4232-BC09-405E0438D829}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D05F42C-A49F-4232-BC09-405E0438D829}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{B60AE799-0118-48D3-88DF-9A1D14FCB09E} = {2512A799-80D6-4897-954A-D4374023A381}
+		{5D05F42C-A49F-4232-BC09-405E0438D829} = {8749EAD6-4E2F-4DA2-ABB2-2A9FB00AC912}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2C8607F8-5053-4848-A0B7-294717DF3C9D}

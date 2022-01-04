@@ -5,16 +5,21 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-	<LangVersion>10</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Recoil.net.Component.DevTools\Recoil.net.Component.DevTools.csproj" />
-    <ProjectReference Include="..\..\src\Recoil.net\Recoil.net.csproj" />
+    <PackageReference Include="NodeNetwork" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="Pages\Tasklist\TaskListPage.xaml">
+    <ProjectReference Include="..\Recoil.net\Recoil.net.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Pages\EventViewerPage.xaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Page>
+    <Page Update="Pages\StateNodeGraphPage.xaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Page>
   </ItemGroup>

@@ -1,0 +1,8 @@
+﻿<Application x:Class="Recoil.net.DevTools.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Recoil.net.DevTools" xmlns:state="clr-namespace:RecoilNet.State;assembly=Recoil.net"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+    </Application.Resources>
+</Application>

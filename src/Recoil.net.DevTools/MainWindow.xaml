@@ -1,0 +1,46 @@
+﻿<Window x:Class="Recoil.net.DevTools.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Recoil.net.DevTools"
+        xmlns:data="clr-namespace:Recoil.net.DevTools.Data"
+        xmlns:controls="clr-namespace:Recoil.net.DevTools.Controls"
+        xmlns:nodenetwork="clr-namespace:NodeNetwork.Views;assembly=NodeNetwork" xmlns:recoilnet="clr-namespace:RecoilNet;assembly=Recoil.net"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type={x:Type local:MainWindow}}"
+        Title="MainWindow" Height="450" Width="800">
+    <recoilnet:RecoilRoot Store="{StaticResource RecoilStore}">
+        <DockPanel>
+            <Grid DockPanel.Dock="Top">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <ComboBox>
+                    <ComboBoxItem Content="Data Visual"  />
+                </ComboBox>
+                <ComboBox Grid.Column="2" 
+                          HorizontalContentAlignment="Stretch"
+                          ItemsSource="{Binding Processes.Value}" 
+                          SelectedIndex="{Binding SelectedProcessIndex.Value}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type data:ProcessTarget}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock DockPanel.Dock="Right" Text="{Binding Id}" MinWidth="36" Foreground="Gray"/>
+                                <Rectangle Width="1" VerticalAlignment="Stretch" Fill="Gray" Margin="5, 3"/>
+                                <TextBlock  DockPanel.Dock="Left" Text="{Binding Name}"/>
+                                
+                            </StackPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </Grid>
+            <Grid>
+                <controls:ProcessInspectorControl/>
+                <!--<nodenetwork:NetworkView />-->
+            </Grid>
+        </DockPanel>
+    </recoilnet:RecoilRoot>
+</Window>
