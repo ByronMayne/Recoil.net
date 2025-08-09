@@ -32,7 +32,7 @@ namespace RecoilNet
 		/// <returns>The created atom</returns>
 		public static Atom<T> Create<T>(Expression<PropertyAccessor<T>> expression, T? defaultValue)
 		{
-			ArgumentNullException.ThrowIfNull(expression);
+            Gaurd.ThrowIfNull(expression);
 			string path = ExpressionUtility.GetPropertyPath(expression);
 			return new Atom<T>(path, defaultValue);
 		}

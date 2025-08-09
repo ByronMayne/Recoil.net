@@ -39,7 +39,7 @@ namespace RecoilNet
 		/// <param name="key">A unique key for the given object</param>
 		protected RecoilValue(string key)
 		{
-			ArgumentNullException.ThrowIfNull(key);
+			Gaurd.ThrowIfNull(key);
 			Key = key;
 			m_dependents = new HashSet<RecoilValue>();
 		}

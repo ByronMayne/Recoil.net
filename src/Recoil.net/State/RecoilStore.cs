@@ -37,13 +37,13 @@ namespace RecoilNet.State
 		public RecoilStore() : this(Array.Empty<IStoreComponent>())
 		{ }
 
-		/// <summary>
-		/// Creats a new recoil store with a set list of components 
-		/// </summary>
-		/// <param name="components"></param>
-		public RecoilStore(IEnumerable<IStoreComponent> components)
+        /// <summary>
+        /// Creates a new recoil store with a set list of components 
+        /// </summary>
+        /// <param name="components"></param>
+        public RecoilStore(IEnumerable<IStoreComponent> components)
 		{
-			ArgumentNullException.ThrowIfNull(components);
+            Gaurd.ThrowIfNull(components);
 
 			m_components = components.ToArray();
 			m_objects = new Dictionary<string, RecoilValue>();
@@ -105,7 +105,7 @@ namespace RecoilNet.State
 			{
 				previousValue = GetValue<T>(atom);
 
-				if (EqualityComparer<T>.Default.Equals(previousValue, value))
+				if (EqualityComparer<T?>.Default.Equals(previousValue, value))
 				{
 					// Values are already equal
 					return;
@@ -129,7 +129,7 @@ namespace RecoilNet.State
 		private async Task NotifyListenersAsync<T>(Atom<T> changedAtom, T? value)
 		{
 			HashSet<RecoilValue> dependents = new HashSet<RecoilValue>();
-			GetDepdendents(changedAtom, dependents);
+			GetDependents(changedAtom, dependents);
 
 			foreach (RecoilState state in m_states)
 			{
@@ -152,7 +152,7 @@ namespace RecoilNet.State
 		}
 
 
-		private static void GetDepdendents(RecoilValue current, HashSet<RecoilValue> dependents)
+        private static void GetDependents(RecoilValue current, HashSet<RecoilValue> dependents)
 		{
 			if (current.Dependents.Count > 0)
 			{
@@ -160,7 +160,7 @@ namespace RecoilNet.State
 				{
 					dependents.Add(dependent);
 
-					GetDepdendents(dependent, dependents);
+					GetDependents(dependent, dependents);
 				}
 			}
 		}
@@ -168,7 +168,7 @@ namespace RecoilNet.State
 		/// <inheritdoc cref="IRecoilStore"/>
 		public T? GetValue<T>(Atom<T> recoilObject)
 		{
-			ArgumentNullException.ThrowIfNull(recoilObject);
+            Gaurd.ThrowIfNull(recoilObject);
 
 			TrackObject(recoilObject);
 			return HasValue(recoilObject)
@@ -185,7 +185,7 @@ namespace RecoilNet.State
 		/// <inheritdoc cref="IRecoilStore"/>
 		public bool TryGetValue<T>(Atom<T> recoilObject, out T? value)
 		{
-			ArgumentNullException.ThrowIfNull(recoilObject);
+            Gaurd.ThrowIfNull(recoilObject);
 			value = default;
 
 			if (HasValue(recoilObject))

@@ -26,15 +26,15 @@ namespace RecoilNet
 		/// <param name="getter">The method to get the value</param>
 		public Selector(string key, ValueGetter getter) : base(key, false)
 		{
-			ArgumentNullException.ThrowIfNull(getter);
+            Gaurd.ThrowIfNull(getter);
 			m_getter = getter;
 		}
 
 
 		public Selector(string key, ValueGetter getter, ValueSetter setter) : base(key, true)
 		{
-			ArgumentNullException.ThrowIfNull(getter);
-			ArgumentNullException.ThrowIfNull(getter);
+            Gaurd.ThrowIfNull(getter);
+            Gaurd.ThrowIfNull(getter);
 			m_getter = getter;
 			m_setter = setter;
 		}

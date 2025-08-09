@@ -1,9 +1,6 @@
 ﻿using RecoilNet.Effects;
 using RecoilNet.State;
 using RecoilNet.Utility;
-using System.Diagnostics;
-using System.Windows.Input;
-using System.Windows.Media.Effects;
 
 namespace RecoilNet
 {
@@ -53,7 +50,7 @@ namespace RecoilNet
 
 		internal Atom(string key, RecoilValue<T> defaultRecoilValue, params IAtomEffect<T>[] effects) : base(key, true)
 		{
-			ArgumentNullException.ThrowIfNull(defaultRecoilValue);
+            Gaurd.ThrowIfNull(defaultRecoilValue);
 
 			Effects = effects ?? Array.Empty<IAtomEffect<T>>();
 			m_defaultValueProvider = defaultRecoilValue.GetValueAsync;

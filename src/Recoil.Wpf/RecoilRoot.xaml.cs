@@ -1,6 +1,4 @@
 ﻿using RecoilNet.State;
-using System.Windows;
-using System.Windows.Controls;
 
 namespace RecoilNet
 {
@@ -13,9 +11,7 @@ namespace RecoilNet
         /// Gets or sets the recoil store to use
         /// </summary>
         public RecoilStore Store
-        {
-            get { return (RecoilStore)GetValue(StoreProperty); }
-            set { SetValue(StoreProperty, value); }
+        { get => (RecoilStore)GetValue(StoreProperty); set => SetValue(StoreProperty, value);
         }
 
         /// <summary>
@@ -32,10 +28,10 @@ namespace RecoilNet
 
 
         public static readonly DependencyProperty OverrideProperty =
-			DependencyProperty.Register(nameof(Override), typeof(bool), 
+            DependencyProperty.Register(nameof(Override), typeof(bool),
                 typeof(RecoilRoot), new PropertyMetadata(true));
 
-		public static readonly DependencyProperty StoreProperty =
+        public static readonly DependencyProperty StoreProperty =
             DependencyProperty.Register(
                 nameof(Store),
                 typeof(RecoilStore),

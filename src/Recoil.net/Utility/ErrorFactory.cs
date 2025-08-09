@@ -35,25 +35,6 @@ public class MyClass : FrameworkElement
 		}
 
 		/// <summary>
-		/// Exception thrown while requesting an <see cref="RecoilRoot"/> object and none was found.
-		/// </summary>
-		/// <param name="dependencyObject">The object to start looking for the parent from </param>
-		/// <returns></returns>
-		public static RecoilException NoRecoilRootFound(DependencyObject dependencyObject)
-		{
-			bool isLoaded = dependencyObject is FrameworkElement element ? element.IsLoaded : true;
-
-			string errorMessage = @$"Unable to find any {nameof(RecoilRoot)} in the parent hiearchy for {dependencyObject.GetType().Name}.";
-
-			if (!isLoaded)
-			{
-				errorMessage += "\n You were requesting the root from an element that has not been loaded yet, this will always fail.";
-			}
-
-			throw new RecoilException(errorMessage);
-		}
-
-		/// <summary>
 		/// Exception thrown while trying to set the value of an object that is not mutable
 		/// </summary>
 		public static RecoilException AssigningValueToNonMutableType<T>(RecoilValue<T> objectType)

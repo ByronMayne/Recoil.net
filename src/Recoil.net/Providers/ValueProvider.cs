@@ -21,7 +21,7 @@ namespace RecoilNet.Providers
 
 		public async Task<TValue?> GetAsync<TValue>(Atom<TValue> atom)
 		{
-			ArgumentNullException.ThrowIfNull(atom);
+            Gaurd.ThrowIfNull(atom);
 
 			atom.AddDependent(m_recoilValue);
 			return await atom.GetValueAsync(m_store);
@@ -29,7 +29,7 @@ namespace RecoilNet.Providers
 
 		public async Task<TValue?> GetAsync<TValue>(Selector<TValue> selector)
 		{
-			ArgumentNullException.ThrowIfNull(selector);
+            Gaurd.ThrowIfNull(selector);
 			selector.AddDependent(m_recoilValue);
 			return await selector.GetValueAsync(m_store);
 		}
