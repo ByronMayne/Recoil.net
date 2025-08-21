@@ -34,12 +34,12 @@ namespace Recoil.Components.DevTools
 
 		public void OnStateAdded<T>(RecoilState<T> state, IRecoilStore recoilStore)
 		{
-			SendObject(new StateAddedPayload(state.RecoilValue.Key, recoilStore.Id));
+			SendObject(new StateAddedPayload(state.Primitive.Key, recoilStore.Id));
 		}
 
 		public void OnStateRemoved<T>(RecoilState<T> state, IRecoilStore recoilStore)
 		{
-			SendObject(new StateRemovedPayload(state.RecoilValue.Key, recoilStore.Id));
+			SendObject(new StateRemovedPayload(state.Primitive.Key, recoilStore.Id));
 		}
 
 		public void OnValueChanged<T>(RecoilStore recoilStore, Atom<T> changedAtom, T? value, HashSet<RecoilValue> dependents)

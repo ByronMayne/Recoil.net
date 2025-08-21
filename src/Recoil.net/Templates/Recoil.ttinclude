@@ -1,0 +1,84 @@
+﻿<#@ template language="C#" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Collections" #>
+<# 
+	List<MethodOverload> MethodOverloads = new List<MethodOverload>()
+	{
+		new MethodOverload(false, false, pairs: new string[0]),
+		new MethodOverload(false, false, new string[] { "T", "constant"} ),
+		new MethodOverload(false, false, new string[] {"Func<T>", "factory"} ),
+		new MethodOverload(false, false, new string[] { "Task<T>", "asyncValue"} ),
+		new MethodOverload(false, false, new string[] {"Func<Task<T>>", "asyncFactory"} ),
+		new MethodOverload(false, false, new string[] {"Func<IRecoilStore, T>", "recoilValue"}),
+		new MethodOverload(false, false, new string[] {"Func<IRecoilStore, Task<T>>", "asyncRecoilValue"}),
+
+		new MethodOverload(false, true, new string[] { "Func<TParam, T?>", "keyedFactory"}),
+		new MethodOverload(false, true, new string[] { "AtomFamily<T, TParam>", "atomFamily"}),
+		new MethodOverload(false, true, new string[] { "AtomFamily<T, TParam>", "atomFamily", "TParam", "fixedValue"}),
+		
+		new MethodOverload(false, false, new string[] { "Atom<T>", "atom"} ),
+		new MethodOverload(false, false, new string[] { "Selector<T>", "selector"} ),
+		// new MethodOverload(false, false, new string[] { "AtomFamily<T, TParam>", "atomFamily", "TParam", "param"}),
+		// new MethodOverload(false, false, new string[] { "SelectorFamily<T, TParam>", "atomFamily", "TParam", "param"}),
+	};
+#>
+<#+
+	public class MethodOverload
+	{
+		public bool IsFamily { get; }
+		public bool HasTypeParam {get;}
+		public string[] TypeParameters { get; set;} 
+		public IReadOnlyList<KeyValuePair<string, string>> Parameters { get; }
+
+		public MethodOverload(
+			bool isFamily,
+			bool hasTypeParam,
+			string[] pairs)
+		{
+			List<KeyValuePair<string, string>> parameters = new List<KeyValuePair<string, string>>();
+			IsFamily = isFamily;
+			HasTypeParam = hasTypeParam;
+			for(int i = 0; i < pairs.Length; i++)
+			{
+				parameters.Add(new KeyValuePair<string, string>(pairs[i], pairs[++i]));
+			}
+			Parameters = parameters;
+		}
+
+		public MethodOverload(bool isFamily,
+			KeyValuePair<string, string>[] parameters )
+		{
+			IsFamily = isFamily;
+			Parameters = parameters;
+		}
+
+		public string RenderGenerics()
+		{
+			if(HasTypeParam)
+			{
+				return "<T, TParam>";
+			}
+			return "<T>";
+		}
+
+		public string RenderAsParameters()
+		{
+			if(Parameters.Count == 0) 
+			{
+				return "";
+			}
+
+			StringBuilder builder = new StringBuilder();
+			foreach(var pair in Parameters)
+			{
+				builder.Append(", ");
+				builder.Append(pair.Key);
+				if(!string.IsNullOrEmpty(pair.Value))
+				{
+					builder.Append(" ").Append(pair.Value);
+				}
+			}
+			return builder.ToString();
+		}
+	}
+#>

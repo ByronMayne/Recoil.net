@@ -38,7 +38,7 @@ namespace RecoilNet
 		/// </summary>
 		public StoreConfigurationBuilder AddComponent<T>(T instance) where T : IStoreComponent
 		{
-            Gaurd.ThrowIfNull(instance);
+            Gaurd.NotNull(instance);
 			m_components.Add(instance);
 			return this;
 		}

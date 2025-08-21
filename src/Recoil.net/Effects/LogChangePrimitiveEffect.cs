@@ -5,7 +5,7 @@ namespace RecoilNet.Effects
 	/// <summary>
 	/// Adds a log entry every time an atom's value changes
 	/// </summary>
-	public class LogAtomChangeEffect<T> : IAtomEffect<T>
+	public class LogChangePrimitiveEffect<T> : IPrimitiveEffect<T>
 	{
 		public void OnSet(T? newValue, T? oldValue, bool isReset)
 		{

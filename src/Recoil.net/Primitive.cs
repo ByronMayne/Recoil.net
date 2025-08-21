@@ -1,47 +1,57 @@
-﻿using System.Diagnostics;
+﻿using RecoilNet.Diagnostics;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace RecoilNet
 {
-	/// <summary>
-	/// Base class that contains logic shared amoung recoile types
-	/// </summary>
-	[DebuggerDisplay("{RenderDebug()}")]
-	public abstract class RecoilValue : IEqualityComparer<RecoilValue>
+    /// <summary>
+    /// Base class that contains logic shared amoung recoil types
+    /// </summary>
+    [DebuggerDisplay("{RenderDebug()}")]
+	public abstract class Primitive : IEqualityComparer<Primitive>
 	{
-		public class EqualityComparer : IEqualityComparer<RecoilValue>
+		public class EqualityComparer : IEqualityComparer<Primitive>
 		{
-			public bool Equals(RecoilValue? x, RecoilValue? y)
+			public bool Equals(Primitive? x, Primitive? y)
 				=> ReferenceEquals(x, y);
 
-			public int GetHashCode([DisallowNull] RecoilValue obj)
+			public int GetHashCode([DisallowNull] Primitive obj)
 				=> obj.Key.GetHashCode();
 		}
 
-		protected readonly HashSet<RecoilValue> m_dependents;
+		protected readonly HashSet<Primitive> m_dependents;
 
 		/// <summary>
 		/// Gets the unique string used to identify the atom internally. 
 		/// This string should be unique with respect to other atoms and selectors 
 		/// in the entire application.
 		/// </summary>
-		public string Key { get; }
+		public Key Key { get; }
+
+        /// <summary>
+        /// Gets the information about the creator of this recoil primitive.
+        /// </summary>
+        public CallerInfo CreatorInfo { get; }
+
+		public Primitive DefaultValue { get; }
 
 		/// <summary>
 		/// Gets all the nodes that depend on this one for their value
 		/// </summary>
-		public IReadOnlyCollection<RecoilValue> Dependents
+		public IReadOnlyCollection<Primitive> Dependents
 			=> m_dependents;
 
 		/// <summary>
 		/// Initializes a new instance of a recoil object.
 		/// </summary>
 		/// <param name="key">A unique key for the given object</param>
-		protected RecoilValue(string key)
+		/// <param name="creatorInfo">Contains information about who created this object, used for debugging</param>
+		protected Primitive(Key key, CallerInfo creatorInfo)
 		{
-			Gaurd.ThrowIfNull(key);
+			Gaurd.NotNull(key);
 			Key = key;
-			m_dependents = new HashSet<RecoilValue>();
+			CreatorInfo = creatorInfo;
+            m_dependents = new HashSet<Primitive>();
 		}
 
 		/// <summary>
@@ -56,9 +66,9 @@ namespace RecoilNet
 		/// <summary>
 		/// Adds a new recoil object that depends on this one
 		/// </summary>
-		internal void AddDependent(RecoilValue recoilObject)
+		internal void AddDependent(Primitive primitive)
 		{
-			m_dependents.Add(recoilObject);
+			m_dependents.Add(primitive);
 		}
 
 		/// <summary>
@@ -70,16 +80,16 @@ namespace RecoilNet
 			{
 				case string asString:
 					return string.Equals(Key, asString, StringComparison.Ordinal);
-				case RecoilValue recoilObject:
+				case Primitive recoilObject:
 					return ReferenceEquals(recoilObject, obj);
 			}
 			return false;
 		}
 
-		public bool Equals(RecoilValue? x, RecoilValue? y)
+		public bool Equals(Primitive? x, Primitive? y)
 			=> object.ReferenceEquals(x, y);
 
-		public int GetHashCode([DisallowNull] RecoilValue obj)
+		public int GetHashCode([DisallowNull] Primitive obj)
 			=> obj.GetHashCode();
 
 		/// <summary>

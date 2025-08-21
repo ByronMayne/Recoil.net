@@ -7,7 +7,7 @@ namespace RecoilNet.Utility
 	/// <summary>
 	/// Contains helper methods for formatting errors that happen at runtime 
 	/// </summary>
-	internal static class ErrorFactory
+	public static class ErrorFactory
 	{
 		public static RecoilException StateCreatedAfterComponentInitialized(Type elementType)
 		{
@@ -37,7 +37,7 @@ public class MyClass : FrameworkElement
 		/// <summary>
 		/// Exception thrown while trying to set the value of an object that is not mutable
 		/// </summary>
-		public static RecoilException AssigningValueToNonMutableType<T>(RecoilValue<T> objectType)
+		public static RecoilException AssigningValueToNonMutableType<T>(Primitive<T> objectType)
 		{
 			string error = $"You are unable to asssing a value to the object of type '{objectType.GetType().Name}' of the key '{objectType.Key}' because " +
 				$"it's marked at not mutable.";

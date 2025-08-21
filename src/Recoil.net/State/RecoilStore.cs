@@ -1,249 +1,131 @@
-﻿using RecoilNet.Components;
-using RecoilNet.Effects;
+﻿using RecoilNet;
+using RecoilNet.State.Instructions;
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Channels;
 
 namespace RecoilNet.State
 {
-	/// <summary>
-	/// THe 
-	/// </summary>
-	public sealed class RecoilStore : IRecoilStore, IDisposable
-	{
-		private static int s_nextId = 0;
-		private readonly IDictionary<string, RecoilValue> m_objects;
-		private readonly IDictionary<string, object?> m_values;
-		private readonly IReadOnlyList<IStoreComponent> m_components;
+    public class RecoilStore : IRecoilStore
+    {
+        private readonly static IReadOnlyList<RecoilStore> s_stores;
 
-		private static readonly Dictionary<int, WeakReference<RecoilStore>> s_stores;
-		private List<RecoilState> m_states;
+        private readonly CancellationTokenSource m_cancellationTokenSource;
+        private readonly ConcurrentBag<RecoilState> m_states;
+        private readonly ConcurrentDictionary<Primitive, Task> m_pendingTasks = new();
+        private readonly ConcurrentDictionary<Primitive, object?> m_values = new();
+        private readonly ConcurrentQueue<Instruction> m_instructionsQueue;
+        private readonly SemaphoreSlim m_instructionsSemaphore;
 
-		/// <inheritdoc cref="IRecoilStore"/>
-		public int Id { get; }
-
-		/// <summary>
-		/// Contains a weak reference to all the RecoilStores that have been defined.
-		/// </summary>
-		internal static IReadOnlyDictionary<int, WeakReference<RecoilStore>> Stores
-			=> s_stores;
-
-		static RecoilStore()
-		{
-			s_stores = new Dictionary<int, WeakReference<RecoilStore>>();
-		}
-
-		/// <summary>
-		/// Creates a new recoil store without any custom components 
-		/// </summary>
-		public RecoilStore() : this(Array.Empty<IStoreComponent>())
-		{ }
-
-        /// <summary>
-        /// Creates a new recoil store with a set list of components 
-        /// </summary>
-        /// <param name="components"></param>
-        public RecoilStore(IEnumerable<IStoreComponent> components)
-		{
-            Gaurd.ThrowIfNull(components);
-
-			m_components = components.ToArray();
-			m_objects = new Dictionary<string, RecoilValue>();
-			m_values = new Dictionary<string, object?>();
-			m_states = new List<RecoilState>();
-			Id = ++s_nextId;
-			s_stores[Id] = new WeakReference<RecoilStore>(this);
-
-			foreach (IStoreComponent component in m_components)
-			{
-				component.Initialize(this);
-			}
-		}
-
-		/// <inheritdoc cref="IRecoilStore"/>
-		public void AddState<T>(RecoilState<T> state)
-		{
-			m_states.Add(state);
-
-			foreach (IStoreComponent component in m_components)
-			{
-				component.OnStateAdded<T>(state, this);
-			}
-		}
-
-		/// <inheritdoc cref="IRecoilStore"/>
-		public void RemoveState<T>(RecoilState<T> state)
-		{
-			m_states.Remove(state);
-
-			foreach (IStoreComponent component in m_components)
-			{
-				component.OnStateRemoved<T>(state, this);
-			}
-		}
-
-		public async Task SetValueAsync<T>(Atom<T> atom, T? value)
-		{
-			SetValueInternal(atom, value);
-			await NotifyListenersAsync<T>(atom, value);
-		}
+        public int Id { get; }
 
 
-		/// <inheritdoc cref="IRecoilStore"/>
-		public void SetValue<T>(Atom<T> atom, T? value)
-		{
-			SetValueInternal(atom, value);
-			// Notify on background job 
-			Task.Run(() => NotifyListenersAsync<T>(atom, value));
-		}
+        static RecoilStore()
+        {
+            s_stores = new List<RecoilStore>();
+        }
 
-		private void SetValueInternal<T>(Atom<T> atom, T? value)
-		{
-			TrackObject(atom);
+        public RecoilStore()
+        {
+            m_states = new ConcurrentBag<RecoilState>();
+            m_pendingTasks = new ConcurrentDictionary<Primitive, Task>();
+            m_values = new ConcurrentDictionary<Primitive, object?>();
+            m_instructionsQueue = new ConcurrentQueue<Instruction>();
+            m_instructionsSemaphore = new SemaphoreSlim(0);
+            m_cancellationTokenSource = new CancellationTokenSource();
+            Task.Factory.StartNew(() => ProcessInstructionsAsync(m_cancellationTokenSource.Token), 
+                TaskCreationOptions.LongRunning);
+        }
 
-			T? previousValue = default(T);
+        /// <inheritdoc cref="GetAsync(Primitive, CancellationToken)"/>
+        public async Task<object?> GetAsync(Primitive primitive, CancellationToken cancellationToken = default)
+        {
+            // If a set is in progress, wait for it to complete
+            if (m_pendingTasks.TryGetValue(primitive, out var pendingTask))
+            {
+                await pendingTask.ConfigureAwait(false);
+            }
 
-			if (HasValue<T>(atom))
-			{
-				previousValue = GetValue<T>(atom);
+            // Try to get the value if available
+            if (m_values.TryGetValue(primitive, out object? value))
+            {
+                return value;
+            }
 
-				if (EqualityComparer<T?>.Default.Equals(previousValue, value))
-				{
-					// Values are already equal
-					return;
-				}
-
-			}
-
-			// Invoke effects 
-			if (atom is Atom<T> asAtom)
-			{
-				foreach (IAtomEffect<T> effect in asAtom.Effects)
-				{
-					effect.OnSet(value, previousValue, false);
-				}
-			}
-
-			// Set it 
-			m_values[atom.Key] = value;
-		}
-
-		private async Task NotifyListenersAsync<T>(Atom<T> changedAtom, T? value)
-		{
-			HashSet<RecoilValue> dependents = new HashSet<RecoilValue>();
-			GetDependents(changedAtom, dependents);
-
-			foreach (RecoilState state in m_states)
-			{
-				if (changedAtom == state.RecoilValue)
-				{
-					await state.ValueChangedAsync(this, m_values[changedAtom.Key]);
-				}
-				else if (dependents.Contains(state.RecoilValue))
-				{
-					await state.DependentChangedAsync(this, changedAtom);
-				}
-			}
-
-			// We invoke this after because `dependents` could be modifed by external plugins and
-			// at this point we don't care anymore 
-			foreach (IStoreComponent component in m_components)
-			{
-				component.OnValueChanged<T>(this, changedAtom, value, dependents);
-			}
-		}
+            // Otherwise, fetch from primitive
+            return await GetAsync(primitive.DefaultValue);
+        }
 
 
-        private static void GetDependents(RecoilValue current, HashSet<RecoilValue> dependents)
-		{
-			if (current.Dependents.Count > 0)
-			{
-				foreach (RecoilValue dependent in current.Dependents)
-				{
-					dependents.Add(dependent);
+        public void Set(Primitive primitive, object? value)
+        {
+            SetInstruction instruction = new SetInstruction(primitive, value);
+            m_instructionsQueue.Enqueue(instruction);
+        }
 
-					GetDependents(dependent, dependents);
-				}
-			}
-		}
+        private async Task ProcessInstructionsAsync(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                await m_instructionsSemaphore.WaitAsync(cancellationToken);
 
-		/// <inheritdoc cref="IRecoilStore"/>
-		public T? GetValue<T>(Atom<T> recoilObject)
-		{
-            Gaurd.ThrowIfNull(recoilObject);
+                if(m_instructionsQueue.TryDequeue(out Instruction? instruction))
+                {
+                    switch (instruction)
+                    {
+                        case SetInstruction set:
+                            m_values[set.Primitive] = set.Value;
+                            break;
+                        case ResetInstruction reset:
+                            m_values.TryRemove(reset.Primitive, out _);
+                            break;
+                    }
 
-			TrackObject(recoilObject);
-			return HasValue(recoilObject)
-				? (T?)m_values[recoilObject.Key]
-				: throw new KeyNotFoundException($"Unable to find value for the atom '{recoilObject.Key}'");
-		}
+                    await NotifyDependentsAsync(instruction.Primitive, cancellationToken);
+                }
+            }
+        }
 
-		/// <inheritdoc cref="IRecoilStore"/>
-		public bool HasValue<T>(Atom<T>? recoilObject)
-		{
-			return recoilObject != null && m_values.ContainsKey(recoilObject.Key);
-		}
+        private async Task NotifyDependentsAsync(Primitive primitive, CancellationToken cancellationToken)
+        {
+            HashSet<Primitive> dependents = new HashSet<Primitive>();
+            GetDependents(primitive, dependents);
 
-		/// <inheritdoc cref="IRecoilStore"/>
-		public bool TryGetValue<T>(Atom<T> recoilObject, out T? value)
-		{
-            Gaurd.ThrowIfNull(recoilObject);
-			value = default;
+            foreach (RecoilState state in m_states)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
 
-			if (HasValue(recoilObject))
-			{
-				value = GetValue(recoilObject);
-				return true;
-			}
-			return false;
-		}
+                if (state.Primitive == primitive)
+                {
+                    var stateValue = await GetAsync(state.Primitive);
+                    await state.ValueChangedAsync(this, stateValue);
+                }
+                else if (dependents.Contains(state.Primitive))
+                {
+                    await state.DependentChangedAsync(this, state.Primitive);
+                }
+            }
+        }
 
-		/// <inheritdoc cref="IRecoilStore"/>
-		public void ResetValue<T>(Atom<T> recoilObject)
-		{
-			TrackObject(recoilObject);
-			if (HasValue(recoilObject))
-			{
-				m_values.Remove(recoilObject.Key);
-			}
-		}
+        private static void GetDependents(Primitive current, HashSet<Primitive> dependents)
+        {
+            if (current.Dependents.Count > 0)
+            {
+                foreach (Primitive dependent in current.Dependents)
+                {
+                    dependents.Add(dependent);
 
-		private void TrackObject(RecoilValue recoilObject)
-		{
-			if (m_objects.ContainsKey(recoilObject.Key))
-			{
-				RecoilValue otherObject = m_objects[recoilObject.Key];
+                    GetDependents(dependent, dependents);
+                }
+            }
+        }
 
-				if (!ReferenceEquals(otherObject, recoilObject))
-				{
-					string error = $"The key '{recoilObject.Key}' for the {recoilObject.GetType().Name} already" +
-						$"exists for other Rocoil object {otherObject.GetType().Name}. Each key can only be used " +
-						" once but the instance can be shared.";
-					throw new InvalidOperationException(error);
-				}
-			}
-			else
-			{
-				m_objects[recoilObject.Key] = recoilObject;
-			}
-		}
-
-		/// <inheritdoc cref="IRecoilStore"/>
-		public RecoilState<T> UseState<T>(Atom<T> atom)
-		{
-			return new RecoilState<T>(atom, this);
-		}
-
-		/// <inheritdoc cref="IRecoilStore"/>
-		public RecoilState<T> UseState<T>(Selector<T> selector)
-		{
-			return new RecoilState<T>(selector, this);
-		}
-
-		void IDisposable.Dispose()
-		{
-			m_values.Clear();
-			s_stores.Clear();
-			m_objects.Clear();
-			s_stores.Remove(Id);
-		}
-	}
+        public void Dispose()
+        {
+            m_cancellationTokenSource.Cancel();
+        }
+    }
 }

@@ -12,7 +12,7 @@ namespace RecoilNet
     public sealed class RecoilState<T> : RecoilState
     {
         private T? m_value;
-        private readonly RecoilValue<T> m_recoilValue;
+        private readonly Primitive<T> m_recoilValue;
 
         /// <summary>
         /// Raised whenever the value of this state changes 
@@ -49,7 +49,7 @@ namespace RecoilNet
         /// </summary>
         /// <param name="get">A delegate to fetch the value</param>
         /// <param name="set">A delegate to set the value</param>
-        public RecoilState(RecoilValue<T> recoilValue, IRecoilStore? store) : base(recoilValue, store)
+        public RecoilState(Primitive<T> recoilValue, IRecoilStore? store) : base(recoilValue, store)
         {
             m_recoilValue = recoilValue;
 
@@ -109,7 +109,7 @@ namespace RecoilNet
         }
 
         /// <inheritdoc cref="RecoilState"/>
-        protected override async Task OnDependentChangedAsync(IRecoilStore store, RecoilValue dependentValue)
+        protected override async Task OnDependentChangedAsync(IRecoilStore store, Primitive dependentValue)
         {
             m_value = await m_recoilValue.GetValueAsync(m_store);
             RaiseValueChanged();

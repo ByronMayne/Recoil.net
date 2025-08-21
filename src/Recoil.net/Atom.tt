@@ -1,0 +1,54 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ include file="Templates/Recoil.ttinclude" #>
+
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+using System;
+using RecoilNet;
+using RecoilNet.Utility;
+using RecoilNet.Values;
+using System.Linq.Expressions;
+using RecoilNet.State;
+using System.Runtime.CompilerServices;
+using RecoilNet.Effects;
+using RecoilNet.Diagnostics;
+
+namespace Recoil
+{
+	public static partial class Atom
+	{
+<# foreach(var overload in MethodOverloads) { #>
+<# if(overload.IsFamily) { continue; } #>
+<# for(int i = 0; i < 2; i++) {#>
+		public static Atom<T> Create<#=overload.RenderGenerics()#>(Expression<Func<Atom<T>>> expression<#= overload.RenderAsParameters()#>,
+<# if(i == 1) { #>			IPrimitiveEffect<T>[] effects,
+<#}#>
+			[CallerFilePath] string callerFilePath = "",
+			[CallerMemberName] string callerMemberName = "",
+			[CallerLineNumber] int callerLineNumber = 0)<# if(overload.HasTypeParam) { #> 
+				where TParam : notnull
+<#}#>
+		{
+				Gaurd.NotNull(expression, nameof(expression));
+				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
+				string path = ExpressionUtility.GetPropertyPath(expression);
+				Key key = Key.From(path);<# if(i == 0) {#>
+
+				IPrimitiveEffect<T>[] effects = Array.Empty<IPrimitiveEffect<T>>();<#}#>
+
+<# if(overload.Parameters.Count > 0) { #>
+				ValueProvider<T> valueProvider = ValueProvider.Create(<#=overload.Parameters[0].Value#>);
+				return new Atom<T>(key, creatorInfo, valueProvider, effects);
+<#} else {#>
+				ValueProvider<T> valueProvider = ValueProvider<T>.Default;
+				return new Atom<T>(key, creatorInfo, valueProvider, effects);
+<#}#>
+		}
+
+<#}}#>
+
+	}
+}

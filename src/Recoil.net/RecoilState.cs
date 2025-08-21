@@ -21,17 +21,17 @@ namespace RecoilNet
 		/// <summary>
 		/// Gets the recoil value that this state is watching 
 		/// </summary>
-		public RecoilValue RecoilValue { get; }
+		public Primitive Primitive { get; }
 
 		static RecoilState()
 		{
 			s_valueChangedEventArgs = new PropertyChangedEventArgs("Value");
 		}
 
-		protected RecoilState(RecoilValue recoilValue, IRecoilStore? recoilStore)
+		protected RecoilState(Primitive recoilValue, IRecoilStore? recoilStore)
 		{
 			m_syncContext = SynchronizationContext.Current;
-			RecoilValue = recoilValue;
+			Primitive = recoilValue;
 			PropertyChanged = null;
 			SetStore(recoilStore);
 		}
@@ -89,12 +89,12 @@ namespace RecoilNet
 		/// <param name="store">The store that saw the change</param>
 		/// <param name="dependentValue">The dependent value that changed</param>
 		/// <returns>A task to await on</returns>
-		protected abstract Task OnDependentChangedAsync(IRecoilStore store, RecoilValue dependentValue);
+		protected abstract Task OnDependentChangedAsync(IRecoilStore store, Primitive dependentValue);
 
 		/// <summary>
 		/// Internal function to allow store to be set
 		/// </summary>
-		internal void SetStore(IRecoilStore? store)
+		public void SetStore(IRecoilStore? store)
 		{
 			OnStoreSet(store);
 		}
@@ -108,9 +108,9 @@ namespace RecoilNet
 		}
 
 		/// <summary>
-		/// Internal function to invoke <see cref="OnDependentChangedAsync(IRecoilStore, RecoilValue)"/>
+		/// Internal function to invoke <see cref="OnDependentChangedAsync(IRecoilStore, Primitive)"/>
 		/// </summary>
-		internal Task DependentChangedAsync(IRecoilStore recoilStore, RecoilValue dependentValue)
+		internal Task DependentChangedAsync(IRecoilStore recoilStore, Primitive dependentValue)
 		{
 			return OnDependentChangedAsync(recoilStore, dependentValue);
 		}

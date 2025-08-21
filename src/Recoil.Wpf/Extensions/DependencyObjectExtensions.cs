@@ -1,4 +1,7 @@
-﻿namespace RecoilNet
+﻿using System.Windows;
+using System.Windows.Media;
+
+namespace RecoilNet
 {
     public static class DependencyObjectExtensions
     {

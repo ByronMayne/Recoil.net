@@ -1,4 +1,6 @@
 ﻿using RecoilNet.State;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace RecoilNet
 {
@@ -11,7 +13,9 @@ namespace RecoilNet
         /// Gets or sets the recoil store to use
         /// </summary>
         public RecoilStore Store
-        { get => (RecoilStore)GetValue(StoreProperty); set => SetValue(StoreProperty, value);
+        { 
+            get => (RecoilStore)GetValue(StoreProperty); 
+            set => SetValue(StoreProperty, value);
         }
 
         /// <summary>
@@ -40,7 +44,6 @@ namespace RecoilNet
 
         public RecoilRoot()
         {
-            InitializeComponent();
         }
     }
 }

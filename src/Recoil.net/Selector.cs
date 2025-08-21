@@ -20,8 +20,8 @@ namespace RecoilNet
 		/// <returns>The created selector</returns>
 		public static Selector<T> Create<T>(Expression<PropertyAccessor<T>> expression, Selector<T>.ValueGetter getter)
 		{
-			Gaurd.ThrowIfNull(expression);
-            Gaurd.ThrowIfNull(getter);
+			Gaurd.NotNull(expression);
+            Gaurd.NotNull(getter);
 			string path = ExpressionUtility.GetPropertyPath(expression);
 			return new Selector<T>(path, getter);
 		}
@@ -35,9 +35,9 @@ namespace RecoilNet
 		/// <returns>The created selector</returns>
 		public static Selector<T> Create<T>(Expression<PropertyAccessor<T>> expression, Selector<T>.ValueGetter getter, Selector<T>.ValueSetter setter)
 		{
-            Gaurd.ThrowIfNull(expression);
-            Gaurd.ThrowIfNull(getter);
-            Gaurd.ThrowIfNull(setter);
+            Gaurd.NotNull(expression);
+            Gaurd.NotNull(getter);
+            Gaurd.NotNull(setter);
 
 			string path = ExpressionUtility.GetPropertyPath(expression);
 			return new Selector<T>(path, getter, setter);

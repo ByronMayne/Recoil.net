@@ -1,70 +1,343 @@
-﻿using RecoilNet.Utility;
+﻿
+
+using System;
+using RecoilNet;
+using RecoilNet.Utility;
+using RecoilNet.Values;
 using System.Linq.Expressions;
-using static RecoilNet.Atom;
+using RecoilNet.State;
+using System.Runtime.CompilerServices;
+using RecoilNet.Effects;
+using RecoilNet.Diagnostics;
 
-namespace RecoilNet
+namespace Recoil
 {
-	/// <summary>
-	/// Just contains helper methods for working with <see cref="Atom{T}"/>s
-	/// </summary>
-	public static class Atom
+	public static partial class Atom
 	{
-		public delegate Atom<T>? PropertyAccessor<T>();
-
-		/// <summary>
-		/// Creates a new Atom{T} with a default being whatever the default of T is. The key will be auto generated
-		/// based of the $"{ClassName}.{PropertyName}" which should keep it unique.
-		/// </summary>
-		/// <typeparam name="T">The value type of the property</typeparam>
-		/// <param name="expression">The expression to access the property</param>
-		/// <returns>The created atom</returns>
-		public static Atom<T> Create<T>(Expression<PropertyAccessor<T>> expression)
-			=> Create<T>(expression, default(T));
-
-
-
-		/// <summary>
-		/// Creates a new Atom{T} with a defined hard coded default value. The key will be auto generated
-		/// based of the $"{ClassName}.{PropertyName}" which should keep it unique.
-		/// </summary>
-		/// <typeparam name="T">The value type of the property</typeparam>
-		/// <param name="expression">The expression to access the property</param>
-		/// <returns>The created atom</returns>
-		public static Atom<T> Create<T>(Expression<PropertyAccessor<T>> expression, T? defaultValue)
-		{
-            Gaurd.ThrowIfNull(expression);
-			string path = ExpressionUtility.GetPropertyPath(expression);
-			return new Atom<T>(path, defaultValue);
+		public static Atom<T> Create<T>(Expression<Func<Atom<T>>> expression,
+			[CallerFilePath] string callerFilePath = "",
+			[CallerMemberName] string callerMemberName = "",
+			[CallerLineNumber] int callerLineNumber = 0)		{
+				Gaurd.NotNull(expression, nameof(expression));
+				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
+				string path = ExpressionUtility.GetPropertyPath(expression);
+				Key key = Key.From(path);
+				IPrimitiveEffect<T>[] effects = Array.Empty<IPrimitiveEffect<T>>();
+				ValueProvider<T> valueProvider = ValueProvider<T>.Default;
+				return new Atom<T>(key, creatorInfo, valueProvider, effects);
 		}
 
-		/// <summary>
-		/// Creates a new Atom{T} with a default value of another atom. The key will be auto generated
-		/// based of the $"{ClassName}.{PropertyName}" which should keep it unique.
-		/// </summary>
-		/// <typeparam name="T">The value type of the property</typeparam>
-		/// <param name="expression">The expression to access the property</param>
-		/// <returns>The created atom</returns>
-		public static Atom<T> Create<T>(Expression<PropertyAccessor<T>> expression, Atom<T> defaultValue)
-			=> CreateRecoilValueInternal<T>(expression, defaultValue);
-
-		/// <summary>
-		/// Creates a new Atom{T} with a default value of a selector. The key will be auto generated
-		/// based of the $"{ClassName}.{PropertyName}" which should keep it unique.
-		/// </summary>
-		/// <typeparam name="T">The value type of the property</typeparam>
-		/// <param name="expression">The expression to access the property</param>
-		/// <returns>The created atom</returns>
-		public static Atom<T> Create<T>(Expression<PropertyAccessor<T>> expression, Selector<T> defaultValue)
-			=> CreateRecoilValueInternal<T>(expression, defaultValue);
-
-		/// <summary>
-		/// Creates a new <see cref="Atom{T}"/> instance using an expression with
-		/// a recoil value as the default.
-		/// </summary>
-		private static Atom<T> CreateRecoilValueInternal<T>(Expression<PropertyAccessor<T>> expression, RecoilValue<T> defaultValue)
-		{
-			string path = ExpressionUtility.GetPropertyPath(expression);
-			return new Atom<T>(path, defaultValue); ;
+		public static Atom<T> Create<T>(Expression<Func<Atom<T>>> expression,
+			IPrimitiveEffect<T>[] effects,
+			[CallerFilePath] string callerFilePath = "",
+			[CallerMemberName] string callerMemberName = "",
+			[CallerLineNumber] int callerLineNumber = 0)		{
+				Gaurd.NotNull(expression, nameof(expression));
+				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
+				string path = ExpressionUtility.GetPropertyPath(expression);
+				Key key = Key.From(path);
+				ValueProvider<T> valueProvider = ValueProvider<T>.Default;
+				return new Atom<T>(key, creatorInfo, valueProvider, effects);
 		}
+
+		public static Atom<T> Create<T>(Expression<Func<Atom<T>>> expression, T constant,
+			[CallerFilePath] string callerFilePath = "",
+			[CallerMemberName] string callerMemberName = "",
+			[CallerLineNumber] int callerLineNumber = 0)		{
+				Gaurd.NotNull(expression, nameof(expression));
+				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
+				string path = ExpressionUtility.GetPropertyPath(expression);
+				Key key = Key.From(path);
+				IPrimitiveEffect<T>[] effects = Array.Empty<IPrimitiveEffect<T>>();
+				ValueProvider<T> valueProvider = ValueProvider.Create(constant);
+				return new Atom<T>(key, creatorInfo, valueProvider, effects);
+		}
+
+		public static Atom<T> Create<T>(Expression<Func<Atom<T>>> expression, T constant,
+			IPrimitiveEffect<T>[] effects,
+			[CallerFilePath] string callerFilePath = "",
+			[CallerMemberName] string callerMemberName = "",
+			[CallerLineNumber] int callerLineNumber = 0)		{
+				Gaurd.NotNull(expression, nameof(expression));
+				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
+				string path = ExpressionUtility.GetPropertyPath(expression);
+				Key key = Key.From(path);
+				ValueProvider<T> valueProvider = ValueProvider.Create(constant);
+				return new Atom<T>(key, creatorInfo, valueProvider, effects);
+		}
+
+		public static Atom<T> Create<T>(Expression<Func<Atom<T>>> expression, Func<T> factory,
+			[CallerFilePath] string callerFilePath = "",
+			[CallerMemberName] string callerMemberName = "",
+			[CallerLineNumber] int callerLineNumber = 0)		{
+				Gaurd.NotNull(expression, nameof(expression));
+				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
+				string path = ExpressionUtility.GetPropertyPath(expression);
+				Key key = Key.From(path);
+				IPrimitiveEffect<T>[] effects = Array.Empty<IPrimitiveEffect<T>>();
+				ValueProvider<T> valueProvider = ValueProvider.Create(factory);
+				return new Atom<T>(key, creatorInfo, valueProvider, effects);
+		}
+
+		public static Atom<T> Create<T>(Expression<Func<Atom<T>>> expression, Func<T> factory,
+			IPrimitiveEffect<T>[] effects,
+			[CallerFilePath] string callerFilePath = "",
+			[CallerMemberName] string callerMemberName = "",
+			[CallerLineNumber] int callerLineNumber = 0)		{
+				Gaurd.NotNull(expression, nameof(expression));
+				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
+				string path = ExpressionUtility.GetPropertyPath(expression);
+				Key key = Key.From(path);
+				ValueProvider<T> valueProvider = ValueProvider.Create(factory);
+				return new Atom<T>(key, creatorInfo, valueProvider, effects);
+		}
+
+		public static Atom<T> Create<T>(Expression<Func<Atom<T>>> expression, Task<T> asyncValue,
+			[CallerFilePath] string callerFilePath = "",
+			[CallerMemberName] string callerMemberName = "",
+			[CallerLineNumber] int callerLineNumber = 0)		{
+				Gaurd.NotNull(expression, nameof(expression));
+				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
+				string path = ExpressionUtility.GetPropertyPath(expression);
+				Key key = Key.From(path);
+				IPrimitiveEffect<T>[] effects = Array.Empty<IPrimitiveEffect<T>>();
+				ValueProvider<T> valueProvider = ValueProvider.Create(asyncValue);
+				return new Atom<T>(key, creatorInfo, valueProvider, effects);
+		}
+
+		public static Atom<T> Create<T>(Expression<Func<Atom<T>>> expression, Task<T> asyncValue,
+			IPrimitiveEffect<T>[] effects,
+			[CallerFilePath] string callerFilePath = "",
+			[CallerMemberName] string callerMemberName = "",
+			[CallerLineNumber] int callerLineNumber = 0)		{
+				Gaurd.NotNull(expression, nameof(expression));
+				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
+				string path = ExpressionUtility.GetPropertyPath(expression);
+				Key key = Key.From(path);
+				ValueProvider<T> valueProvider = ValueProvider.Create(asyncValue);
+				return new Atom<T>(key, creatorInfo, valueProvider, effects);
+		}
+
+		public static Atom<T> Create<T>(Expression<Func<Atom<T>>> expression, Func<Task<T>> asyncFactory,
+			[CallerFilePath] string callerFilePath = "",
+			[CallerMemberName] string callerMemberName = "",
+			[CallerLineNumber] int callerLineNumber = 0)		{
+				Gaurd.NotNull(expression, nameof(expression));
+				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
+				string path = ExpressionUtility.GetPropertyPath(expression);
+				Key key = Key.From(path);
+				IPrimitiveEffect<T>[] effects = Array.Empty<IPrimitiveEffect<T>>();
+				ValueProvider<T> valueProvider = ValueProvider.Create(asyncFactory);
+				return new Atom<T>(key, creatorInfo, valueProvider, effects);
+		}
+
+		public static Atom<T> Create<T>(Expression<Func<Atom<T>>> expression, Func<Task<T>> asyncFactory,
+			IPrimitiveEffect<T>[] effects,
+			[CallerFilePath] string callerFilePath = "",
+			[CallerMemberName] string callerMemberName = "",
+			[CallerLineNumber] int callerLineNumber = 0)		{
+				Gaurd.NotNull(expression, nameof(expression));
+				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
+				string path = ExpressionUtility.GetPropertyPath(expression);
+				Key key = Key.From(path);
+				ValueProvider<T> valueProvider = ValueProvider.Create(asyncFactory);
+				return new Atom<T>(key, creatorInfo, valueProvider, effects);
+		}
+
+		public static Atom<T> Create<T>(Expression<Func<Atom<T>>> expression, Func<IRecoilStore, T> recoilValue,
+			[CallerFilePath] string callerFilePath = "",
+			[CallerMemberName] string callerMemberName = "",
+			[CallerLineNumber] int callerLineNumber = 0)		{
+				Gaurd.NotNull(expression, nameof(expression));
+				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
+				string path = ExpressionUtility.GetPropertyPath(expression);
+				Key key = Key.From(path);
+				IPrimitiveEffect<T>[] effects = Array.Empty<IPrimitiveEffect<T>>();
+				ValueProvider<T> valueProvider = ValueProvider.Create(recoilValue);
+				return new Atom<T>(key, creatorInfo, valueProvider, effects);
+		}
+
+		public static Atom<T> Create<T>(Expression<Func<Atom<T>>> expression, Func<IRecoilStore, T> recoilValue,
+			IPrimitiveEffect<T>[] effects,
+			[CallerFilePath] string callerFilePath = "",
+			[CallerMemberName] string callerMemberName = "",
+			[CallerLineNumber] int callerLineNumber = 0)		{
+				Gaurd.NotNull(expression, nameof(expression));
+				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
+				string path = ExpressionUtility.GetPropertyPath(expression);
+				Key key = Key.From(path);
+				ValueProvider<T> valueProvider = ValueProvider.Create(recoilValue);
+				return new Atom<T>(key, creatorInfo, valueProvider, effects);
+		}
+
+		public static Atom<T> Create<T>(Expression<Func<Atom<T>>> expression, Func<IRecoilStore, Task<T>> asyncRecoilValue,
+			[CallerFilePath] string callerFilePath = "",
+			[CallerMemberName] string callerMemberName = "",
+			[CallerLineNumber] int callerLineNumber = 0)		{
+				Gaurd.NotNull(expression, nameof(expression));
+				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
+				string path = ExpressionUtility.GetPropertyPath(expression);
+				Key key = Key.From(path);
+				IPrimitiveEffect<T>[] effects = Array.Empty<IPrimitiveEffect<T>>();
+				ValueProvider<T> valueProvider = ValueProvider.Create(asyncRecoilValue);
+				return new Atom<T>(key, creatorInfo, valueProvider, effects);
+		}
+
+		public static Atom<T> Create<T>(Expression<Func<Atom<T>>> expression, Func<IRecoilStore, Task<T>> asyncRecoilValue,
+			IPrimitiveEffect<T>[] effects,
+			[CallerFilePath] string callerFilePath = "",
+			[CallerMemberName] string callerMemberName = "",
+			[CallerLineNumber] int callerLineNumber = 0)		{
+				Gaurd.NotNull(expression, nameof(expression));
+				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
+				string path = ExpressionUtility.GetPropertyPath(expression);
+				Key key = Key.From(path);
+				ValueProvider<T> valueProvider = ValueProvider.Create(asyncRecoilValue);
+				return new Atom<T>(key, creatorInfo, valueProvider, effects);
+		}
+
+		public static Atom<T> Create<T, TParam>(Expression<Func<Atom<T>>> expression, Func<TParam, T?> keyedFactory,
+			[CallerFilePath] string callerFilePath = "",
+			[CallerMemberName] string callerMemberName = "",
+			[CallerLineNumber] int callerLineNumber = 0) 
+				where TParam : notnull
+		{
+				Gaurd.NotNull(expression, nameof(expression));
+				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
+				string path = ExpressionUtility.GetPropertyPath(expression);
+				Key key = Key.From(path);
+				IPrimitiveEffect<T>[] effects = Array.Empty<IPrimitiveEffect<T>>();
+				ValueProvider<T> valueProvider = ValueProvider.Create(keyedFactory);
+				return new Atom<T>(key, creatorInfo, valueProvider, effects);
+		}
+
+		public static Atom<T> Create<T, TParam>(Expression<Func<Atom<T>>> expression, Func<TParam, T?> keyedFactory,
+			IPrimitiveEffect<T>[] effects,
+			[CallerFilePath] string callerFilePath = "",
+			[CallerMemberName] string callerMemberName = "",
+			[CallerLineNumber] int callerLineNumber = 0) 
+				where TParam : notnull
+		{
+				Gaurd.NotNull(expression, nameof(expression));
+				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
+				string path = ExpressionUtility.GetPropertyPath(expression);
+				Key key = Key.From(path);
+				ValueProvider<T> valueProvider = ValueProvider.Create(keyedFactory);
+				return new Atom<T>(key, creatorInfo, valueProvider, effects);
+		}
+
+		public static Atom<T> Create<T, TParam>(Expression<Func<Atom<T>>> expression, AtomFamily<T, TParam> atomFamily,
+			[CallerFilePath] string callerFilePath = "",
+			[CallerMemberName] string callerMemberName = "",
+			[CallerLineNumber] int callerLineNumber = 0) 
+				where TParam : notnull
+		{
+				Gaurd.NotNull(expression, nameof(expression));
+				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
+				string path = ExpressionUtility.GetPropertyPath(expression);
+				Key key = Key.From(path);
+				IPrimitiveEffect<T>[] effects = Array.Empty<IPrimitiveEffect<T>>();
+				ValueProvider<T> valueProvider = ValueProvider.Create(atomFamily);
+				return new Atom<T>(key, creatorInfo, valueProvider, effects);
+		}
+
+		public static Atom<T> Create<T, TParam>(Expression<Func<Atom<T>>> expression, AtomFamily<T, TParam> atomFamily,
+			IPrimitiveEffect<T>[] effects,
+			[CallerFilePath] string callerFilePath = "",
+			[CallerMemberName] string callerMemberName = "",
+			[CallerLineNumber] int callerLineNumber = 0) 
+				where TParam : notnull
+		{
+				Gaurd.NotNull(expression, nameof(expression));
+				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
+				string path = ExpressionUtility.GetPropertyPath(expression);
+				Key key = Key.From(path);
+				ValueProvider<T> valueProvider = ValueProvider.Create(atomFamily);
+				return new Atom<T>(key, creatorInfo, valueProvider, effects);
+		}
+
+		public static Atom<T> Create<T, TParam>(Expression<Func<Atom<T>>> expression, AtomFamily<T, TParam> atomFamily, TParam fixedValue,
+			[CallerFilePath] string callerFilePath = "",
+			[CallerMemberName] string callerMemberName = "",
+			[CallerLineNumber] int callerLineNumber = 0) 
+				where TParam : notnull
+		{
+				Gaurd.NotNull(expression, nameof(expression));
+				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
+				string path = ExpressionUtility.GetPropertyPath(expression);
+				Key key = Key.From(path);
+				IPrimitiveEffect<T>[] effects = Array.Empty<IPrimitiveEffect<T>>();
+				ValueProvider<T> valueProvider = ValueProvider.Create(atomFamily);
+				return new Atom<T>(key, creatorInfo, valueProvider, effects);
+		}
+
+		public static Atom<T> Create<T, TParam>(Expression<Func<Atom<T>>> expression, AtomFamily<T, TParam> atomFamily, TParam fixedValue,
+			IPrimitiveEffect<T>[] effects,
+			[CallerFilePath] string callerFilePath = "",
+			[CallerMemberName] string callerMemberName = "",
+			[CallerLineNumber] int callerLineNumber = 0) 
+				where TParam : notnull
+		{
+				Gaurd.NotNull(expression, nameof(expression));
+				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
+				string path = ExpressionUtility.GetPropertyPath(expression);
+				Key key = Key.From(path);
+				ValueProvider<T> valueProvider = ValueProvider.Create(atomFamily);
+				return new Atom<T>(key, creatorInfo, valueProvider, effects);
+		}
+
+		public static Atom<T> Create<T>(Expression<Func<Atom<T>>> expression, Atom<T> atom,
+			[CallerFilePath] string callerFilePath = "",
+			[CallerMemberName] string callerMemberName = "",
+			[CallerLineNumber] int callerLineNumber = 0)		{
+				Gaurd.NotNull(expression, nameof(expression));
+				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
+				string path = ExpressionUtility.GetPropertyPath(expression);
+				Key key = Key.From(path);
+				IPrimitiveEffect<T>[] effects = Array.Empty<IPrimitiveEffect<T>>();
+				ValueProvider<T> valueProvider = ValueProvider.Create(atom);
+				return new Atom<T>(key, creatorInfo, valueProvider, effects);
+		}
+
+		public static Atom<T> Create<T>(Expression<Func<Atom<T>>> expression, Atom<T> atom,
+			IPrimitiveEffect<T>[] effects,
+			[CallerFilePath] string callerFilePath = "",
+			[CallerMemberName] string callerMemberName = "",
+			[CallerLineNumber] int callerLineNumber = 0)		{
+				Gaurd.NotNull(expression, nameof(expression));
+				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
+				string path = ExpressionUtility.GetPropertyPath(expression);
+				Key key = Key.From(path);
+				ValueProvider<T> valueProvider = ValueProvider.Create(atom);
+				return new Atom<T>(key, creatorInfo, valueProvider, effects);
+		}
+
+		public static Atom<T> Create<T>(Expression<Func<Atom<T>>> expression, Selector<T> selector,
+			[CallerFilePath] string callerFilePath = "",
+			[CallerMemberName] string callerMemberName = "",
+			[CallerLineNumber] int callerLineNumber = 0)		{
+				Gaurd.NotNull(expression, nameof(expression));
+				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
+				string path = ExpressionUtility.GetPropertyPath(expression);
+				Key key = Key.From(path);
+				IPrimitiveEffect<T>[] effects = Array.Empty<IPrimitiveEffect<T>>();
+				ValueProvider<T> valueProvider = ValueProvider.Create(selector);
+				return new Atom<T>(key, creatorInfo, valueProvider, effects);
+		}
+
+		public static Atom<T> Create<T>(Expression<Func<Atom<T>>> expression, Selector<T> selector,
+			IPrimitiveEffect<T>[] effects,
+			[CallerFilePath] string callerFilePath = "",
+			[CallerMemberName] string callerMemberName = "",
+			[CallerLineNumber] int callerLineNumber = 0)		{
+				Gaurd.NotNull(expression, nameof(expression));
+				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
+				string path = ExpressionUtility.GetPropertyPath(expression);
+				Key key = Key.From(path);
+				ValueProvider<T> valueProvider = ValueProvider.Create(selector);
+				return new Atom<T>(key, creatorInfo, valueProvider, effects);
+		}
+
+
 	}
 }

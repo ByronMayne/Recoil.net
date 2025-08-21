@@ -1,4 +1,8 @@
-﻿using RecoilNet.State;
+﻿using Recoil.Wpf.Exceptions;
+using RecoilNet.State;
+using System.ComponentModel;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace RecoilNet.Utility
 {
@@ -42,7 +46,7 @@ namespace RecoilNet.Utility
                 // During design mode we don't want to throw exceptions
                 return DesignerProperties.GetIsInDesignMode(element)
                     ? new RecoilStore()
-                    : throw ErrorFactory.NoRecoilRootFound(element);
+                    : throw new NoRecoilRootFoundExceptions(element);
             }
 
             return root.Store;

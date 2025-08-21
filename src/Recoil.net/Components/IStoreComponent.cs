@@ -20,7 +20,7 @@ namespace RecoilNet.Components
 		void Initialize(IRecoilStore store);
 
 		/// <summary>
-		/// Raised whenever a new <see cref="RecoilValue{T}"/> is link to a store instance.
+		/// Raised whenever a new <see cref="Primitive{T}"/> is link to a store instance.
 		/// </summary>
 		/// <typeparam name="T">The value type of the state</typeparam>
 		/// <param name="state">The state instance that was linked</param>
@@ -28,7 +28,7 @@ namespace RecoilNet.Components
 		void OnStateAdded<T>(RecoilState<T> state, IRecoilStore recoilStore);
 
 		/// <summary>
-		/// Raised whenever a new <see cref="RecoilValue{T}"/> is unlinked to a store instance
+		/// Raised whenever a new <see cref="Primitive{T}"/> is unlinked to a store instance
 		/// </summary>
 		/// <typeparam name="T">The value type of the store</typeparam>
 		/// <param name="state">The state that was unlinked</param>
@@ -43,6 +43,6 @@ namespace RecoilNet.Components
 		/// <param name="changedAtom">The atom that was changed</param>
 		/// <param name="value">The new value that was assigned</param>
 		/// <param name="dependents">The list of atoms and selectors that are dependent on the value being changed.</param>
-		void OnValueChanged<T>(RecoilStore recoilStore, Atom<T> changedAtom, T? value, HashSet<RecoilValue> dependents);
+		void OnValueChanged<T>(RecoilStore recoilStore, Atom<T> changedAtom, T? value, HashSet<Primitive> dependents);
 	}
 }

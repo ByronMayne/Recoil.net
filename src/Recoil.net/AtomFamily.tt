@@ -1,0 +1,43 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ include file="Templates/Recoil.ttinclude" #>
+
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+using System;
+using RecoilNet;
+using RecoilNet.Utility;
+using RecoilNet.Values;
+using System.Linq.Expressions;
+using RecoilNet.State;
+using System.Runtime.CompilerServices;
+
+namespace Recoil
+{
+	public static partial class AtomFamily
+	{
+<# foreach(var overload in MethodOverloads) { #>
+<# if(overload.IsFamily) { continue; } #>
+		public static AtomFamily<T,TParam> Create<T,TParam>(Expression<Func<Atom<T>>> expression<#= overload.RenderAsParameters()#>,
+			[CallerFilePath] string callerFilePath = "",
+			[CallerMemberName] string callerMemberName = "",
+			[CallerLineNumber] int callerLineNumber = 0)<# if(overload.HasTypeParam) { #> 
+				where TParam : notnull
+<#}#>
+		{
+			Gaurd.NotNull(expression, nameof(expression));
+			string path = ExpressionUtility.GetPropertyPath(expression);
+<# if(overload.Parameters.Count > 0) { #>
+			ValueProvider<T> valueProvider = ValueProvider.Create(<#=overload.Parameters[0].Value#>);
+			return new Atom<T>(path, valueProvider);
+<#} else {#>
+			return new Atom<T>(path);
+<#}#>
+		}
+
+<#}#>
+
+	}
+}
