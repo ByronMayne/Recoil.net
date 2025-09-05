@@ -10,7 +10,6 @@ namespace RecoilNet.State.Instructions
 
         public SetInstruction(Primitive primitive, object? value) : base(primitive)
         {
-            Primitive = primitive;
             Value = value;
         }
 

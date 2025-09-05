@@ -1,5 +1,4 @@
-﻿using RecoilNet.State;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Windows;
 
 namespace RecoilNet.Utility

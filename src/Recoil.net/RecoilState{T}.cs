@@ -1,5 +1,4 @@
-﻿using RecoilNet.State;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace RecoilNet
 {
@@ -12,7 +11,7 @@ namespace RecoilNet
     public sealed class RecoilState<T> : RecoilState
     {
         private T? m_value;
-        private readonly Primitive<T> m_recoilValue;
+        private readonly Primitive<T> m_primitive;
 
         /// <summary>
         /// Raised whenever the value of this state changes 
@@ -21,15 +20,15 @@ namespace RecoilNet
 
         /// <summary>
         /// Gets or sets the value of th recoil state. It should be noted that setting the value 
-        /// happens in the background in an async operation so the value will not be accessable right away.
+        /// happens in the background in an async operation so the value will not be accessible right away.
         /// </summary>
         public T? Value
         {
             get => m_value;
             set
             {
-                m_value = value; // set it for now but it will be overriden later 
-                Task.Run(() => m_recoilValue.SetValueAsync(m_store, value));
+                m_value = value; // set it for now but it will be overridden later 
+                Recoil.SetValue(m_store, m_primitive, value);
                 State = RecoilValueState.Loading;
             }
         }
@@ -51,7 +50,7 @@ namespace RecoilNet
         /// <param name="set">A delegate to set the value</param>
         public RecoilState(Primitive<T> recoilValue, IRecoilStore? store) : base(recoilValue, store)
         {
-            m_recoilValue = recoilValue;
+            m_primitive = recoilValue;
 
             // Load the default value 
             Task.Run(async () =>
@@ -59,7 +58,7 @@ namespace RecoilNet
                 State = RecoilValueState.Loading;
                 try
                 {
-                    m_value = await m_recoilValue.GetValueAsync(store);
+                    m_value = await Recoil.GetValueAsync(store, m_primitive);
                 }
                 catch (Exception)
                 {
@@ -111,7 +110,7 @@ namespace RecoilNet
         /// <inheritdoc cref="RecoilState"/>
         protected override async Task OnDependentChangedAsync(IRecoilStore store, Primitive dependentValue)
         {
-            m_value = await m_recoilValue.GetValueAsync(m_store);
+            m_value = await Recoil.GetValueAsync(m_store, m_primitive);
             RaiseValueChanged();
         }
 

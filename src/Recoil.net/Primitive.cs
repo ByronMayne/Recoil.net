@@ -33,8 +33,6 @@ namespace RecoilNet
         /// </summary>
         public CallerInfo CreatorInfo { get; }
 
-		public Primitive DefaultValue { get; }
-
 		/// <summary>
 		/// Gets all the nodes that depend on this one for their value
 		/// </summary>
@@ -48,7 +46,7 @@ namespace RecoilNet
 		/// <param name="creatorInfo">Contains information about who created this object, used for debugging</param>
 		protected Primitive(Key key, CallerInfo creatorInfo)
 		{
-			Gaurd.NotNull(key);
+			Guard.NotNull(key);
 			Key = key;
 			CreatorInfo = creatorInfo;
             m_dependents = new HashSet<Primitive>();
@@ -78,8 +76,8 @@ namespace RecoilNet
 		{
 			switch (obj)
 			{
-				case string asString:
-					return string.Equals(Key, asString, StringComparison.Ordinal);
+				case Key key:
+					return key.Equals(Key);
 				case Primitive recoilObject:
 					return ReferenceEquals(recoilObject, obj);
 			}

@@ -1,4 +1,4 @@
-﻿namespace RecoilNet
+﻿namespace RecoilNet.TypeExtensions
 {
     /// <summary>
     /// Contains extension methods for working with Recoil state

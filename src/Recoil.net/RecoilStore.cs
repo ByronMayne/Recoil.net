@@ -1,5 +1,5 @@
-﻿using RecoilNet;
-using RecoilNet.State.Instructions;
+﻿using RecoilNet.State.Instructions;
+using RecoilNet.Utility;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Channels;
 
-namespace RecoilNet.State
+namespace RecoilNet
 {
     public class RecoilStore : IRecoilStore
     {
@@ -15,8 +15,8 @@ namespace RecoilNet.State
 
         private readonly CancellationTokenSource m_cancellationTokenSource;
         private readonly ConcurrentBag<RecoilState> m_states;
-        private readonly ConcurrentDictionary<Primitive, Task> m_pendingTasks = new();
-        private readonly ConcurrentDictionary<Primitive, object?> m_values = new();
+        private readonly ConcurrentDictionary<Key, TaskCompletionSource<object?>> m_pendingTasks = new();
+        private readonly ConcurrentDictionary<Key, object?> m_values = new();
         private readonly ConcurrentQueue<Instruction> m_instructionsQueue;
         private readonly SemaphoreSlim m_instructionsSemaphore;
 
@@ -31,8 +31,8 @@ namespace RecoilNet.State
         public RecoilStore()
         {
             m_states = new ConcurrentBag<RecoilState>();
-            m_pendingTasks = new ConcurrentDictionary<Primitive, Task>();
-            m_values = new ConcurrentDictionary<Primitive, object?>();
+            m_pendingTasks = new ConcurrentDictionary<Key, TaskCompletionSource<object?>>();
+            m_values = new ConcurrentDictionary<Key, object?>();
             m_instructionsQueue = new ConcurrentQueue<Instruction>();
             m_instructionsSemaphore = new SemaphoreSlim(0);
             m_cancellationTokenSource = new CancellationTokenSource();
@@ -40,30 +40,50 @@ namespace RecoilNet.State
                 TaskCreationOptions.LongRunning);
         }
 
+        public async Task<TryGetResult<object?>> TryGetAsync(Primitive primitive, CancellationToken cancellationToken = default)
+        {
+            if (m_pendingTasks.TryGetValue(primitive.Key, out var pendingTask))
+            {
+                await pendingTask.Task;
+            }
+
+            if (m_values.TryGetValue(primitive.Key, out object? value))
+            {
+                return value;
+            }
+
+            return TryGetResult<object?>.Failure;
+        }
+
         /// <inheritdoc cref="GetAsync(Primitive, CancellationToken)"/>
         public async Task<object?> GetAsync(Primitive primitive, CancellationToken cancellationToken = default)
         {
             // If a set is in progress, wait for it to complete
-            if (m_pendingTasks.TryGetValue(primitive, out var pendingTask))
+            if (m_pendingTasks.TryGetValue(primitive.Key, out var pendingTask))
             {
-                await pendingTask.ConfigureAwait(false);
+                await pendingTask.Task;
             }
 
+            // Handle selector evaluation
+
             // Try to get the value if available
-            if (m_values.TryGetValue(primitive, out object? value))
+            if (m_values.TryGetValue(primitive.Key, out object? value))
             {
                 return value;
             }
 
             // Otherwise, fetch from primitive
-            return await GetAsync(primitive.DefaultValue);
+            return default;
         }
 
 
         public void Set(Primitive primitive, object? value)
         {
+            TaskCompletionSource<object?> completionSource = new TaskCompletionSource<object?>();
             SetInstruction instruction = new SetInstruction(primitive, value);
             m_instructionsQueue.Enqueue(instruction);
+            m_instructionsSemaphore.Release(1);
+            m_pendingTasks.AddOrUpdate(primitive.Key, completionSource, (v, c) => completionSource);
         }
 
         private async Task ProcessInstructionsAsync(CancellationToken cancellationToken)
@@ -77,11 +97,17 @@ namespace RecoilNet.State
                     switch (instruction)
                     {
                         case SetInstruction set:
-                            m_values[set.Primitive] = set.Value;
+                            m_values[set.Primitive.Key] = set.Value;
                             break;
                         case ResetInstruction reset:
-                            m_values.TryRemove(reset.Primitive, out _);
+                            m_values.TryRemove(reset.Primitive.Key, out _);
                             break;
+                    }
+
+                    if(m_pendingTasks.TryRemove(instruction.Primitive.Key, out TaskCompletionSource<object?>? completionSource))
+                    {
+                        completionSource.SetResult(null);
+
                     }
 
                     await NotifyDependentsAsync(instruction.Primitive, cancellationToken);
@@ -126,6 +152,16 @@ namespace RecoilNet.State
         public void Dispose()
         {
             m_cancellationTokenSource.Cancel();
+        }
+
+        public void AddState(RecoilState state)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemoveState(RecoilState state)
+        {
+            throw new NotImplementedException();
         }
     }
 }

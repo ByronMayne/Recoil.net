@@ -10,7 +10,7 @@ namespace RecoilNet.State.Instructions
 
         public Instruction(Primitive primitive)
         {
-            Gaurd.NotNull(primitive);
+            Guard.NotNull(primitive);
             Primitive = primitive;
         }
     }

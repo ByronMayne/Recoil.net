@@ -1,140 +1,207 @@
 ﻿
 
 using System;
-using RecoilNet;
 using RecoilNet.Utility;
 using RecoilNet.Values;
+using RecoilNet.Diagnostics;
+using RecoilNet.Effects;
+
 using System.Linq.Expressions;
-using RecoilNet.State;
 using System.Runtime.CompilerServices;
 
-namespace Recoil
+namespace RecoilNet
 {
 	public static partial class AtomFamily
 	{
 		public static AtomFamily<T,TParam> Create<T,TParam>(Expression<Func<Atom<T>>> expression,
+			IPrimitiveEffect<T>[]? effects = null,
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
-			[CallerLineNumber] int callerLineNumber = 0)		{
-			Gaurd.NotNull(expression, nameof(expression));
+			[CallerLineNumber] int callerLineNumber = 0) where TParam : notnull
+		{
+			Guard.NotNull(expression, nameof(expression));
+			effects ??= Array.Empty<IPrimitiveEffect<T>>();
 			string path = ExpressionUtility.GetPropertyPath(expression);
-			return new AtomF<T>(path);
+			Key key = Key.From(path);
+			CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
+			AtomFamilyNode<T,TParam> node = new AtomFamilyNode<T,TParam>(key, creatorInfo, ValueProvider<T>.Default, effects);
+			return node.Get;
 		}
 
 		public static AtomFamily<T,TParam> Create<T,TParam>(Expression<Func<Atom<T>>> expression, T constant,
+			IPrimitiveEffect<T>[]? effects = null,
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
-			[CallerLineNumber] int callerLineNumber = 0)		{
-			Gaurd.NotNull(expression, nameof(expression));
+			[CallerLineNumber] int callerLineNumber = 0) where TParam : notnull
+		{
+			Guard.NotNull(expression, nameof(expression));
+			effects ??= Array.Empty<IPrimitiveEffect<T>>();
 			string path = ExpressionUtility.GetPropertyPath(expression);
+			Key key = Key.From(path);
+			CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 			ValueProvider<T> valueProvider = ValueProvider.Create(constant);
-			return new Atom<T>(path, valueProvider);
+			AtomFamilyNode<T,TParam> node = new AtomFamilyNode<T,TParam>(key, creatorInfo, valueProvider, effects);
+			return node.Get;
 		}
 
 		public static AtomFamily<T,TParam> Create<T,TParam>(Expression<Func<Atom<T>>> expression, Func<T> factory,
+			IPrimitiveEffect<T>[]? effects = null,
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
-			[CallerLineNumber] int callerLineNumber = 0)		{
-			Gaurd.NotNull(expression, nameof(expression));
+			[CallerLineNumber] int callerLineNumber = 0) where TParam : notnull
+		{
+			Guard.NotNull(expression, nameof(expression));
+			effects ??= Array.Empty<IPrimitiveEffect<T>>();
 			string path = ExpressionUtility.GetPropertyPath(expression);
+			Key key = Key.From(path);
+			CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 			ValueProvider<T> valueProvider = ValueProvider.Create(factory);
-			return new Atom<T>(path, valueProvider);
+			AtomFamilyNode<T,TParam> node = new AtomFamilyNode<T,TParam>(key, creatorInfo, valueProvider, effects);
+			return node.Get;
 		}
 
 		public static AtomFamily<T,TParam> Create<T,TParam>(Expression<Func<Atom<T>>> expression, Task<T> asyncValue,
+			IPrimitiveEffect<T>[]? effects = null,
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
-			[CallerLineNumber] int callerLineNumber = 0)		{
-			Gaurd.NotNull(expression, nameof(expression));
+			[CallerLineNumber] int callerLineNumber = 0) where TParam : notnull
+		{
+			Guard.NotNull(expression, nameof(expression));
+			effects ??= Array.Empty<IPrimitiveEffect<T>>();
 			string path = ExpressionUtility.GetPropertyPath(expression);
+			Key key = Key.From(path);
+			CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 			ValueProvider<T> valueProvider = ValueProvider.Create(asyncValue);
-			return new Atom<T>(path, valueProvider);
+			AtomFamilyNode<T,TParam> node = new AtomFamilyNode<T,TParam>(key, creatorInfo, valueProvider, effects);
+			return node.Get;
 		}
 
 		public static AtomFamily<T,TParam> Create<T,TParam>(Expression<Func<Atom<T>>> expression, Func<Task<T>> asyncFactory,
+			IPrimitiveEffect<T>[]? effects = null,
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
-			[CallerLineNumber] int callerLineNumber = 0)		{
-			Gaurd.NotNull(expression, nameof(expression));
+			[CallerLineNumber] int callerLineNumber = 0) where TParam : notnull
+		{
+			Guard.NotNull(expression, nameof(expression));
+			effects ??= Array.Empty<IPrimitiveEffect<T>>();
 			string path = ExpressionUtility.GetPropertyPath(expression);
+			Key key = Key.From(path);
+			CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 			ValueProvider<T> valueProvider = ValueProvider.Create(asyncFactory);
-			return new Atom<T>(path, valueProvider);
+			AtomFamilyNode<T,TParam> node = new AtomFamilyNode<T,TParam>(key, creatorInfo, valueProvider, effects);
+			return node.Get;
 		}
 
 		public static AtomFamily<T,TParam> Create<T,TParam>(Expression<Func<Atom<T>>> expression, Func<IRecoilStore, T> recoilValue,
+			IPrimitiveEffect<T>[]? effects = null,
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
-			[CallerLineNumber] int callerLineNumber = 0)		{
-			Gaurd.NotNull(expression, nameof(expression));
+			[CallerLineNumber] int callerLineNumber = 0) where TParam : notnull
+		{
+			Guard.NotNull(expression, nameof(expression));
+			effects ??= Array.Empty<IPrimitiveEffect<T>>();
 			string path = ExpressionUtility.GetPropertyPath(expression);
+			Key key = Key.From(path);
+			CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 			ValueProvider<T> valueProvider = ValueProvider.Create(recoilValue);
-			return new Atom<T>(path, valueProvider);
+			AtomFamilyNode<T,TParam> node = new AtomFamilyNode<T,TParam>(key, creatorInfo, valueProvider, effects);
+			return node.Get;
 		}
 
 		public static AtomFamily<T,TParam> Create<T,TParam>(Expression<Func<Atom<T>>> expression, Func<IRecoilStore, Task<T>> asyncRecoilValue,
+			IPrimitiveEffect<T>[]? effects = null,
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
-			[CallerLineNumber] int callerLineNumber = 0)		{
-			Gaurd.NotNull(expression, nameof(expression));
+			[CallerLineNumber] int callerLineNumber = 0) where TParam : notnull
+		{
+			Guard.NotNull(expression, nameof(expression));
+			effects ??= Array.Empty<IPrimitiveEffect<T>>();
 			string path = ExpressionUtility.GetPropertyPath(expression);
+			Key key = Key.From(path);
+			CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 			ValueProvider<T> valueProvider = ValueProvider.Create(asyncRecoilValue);
-			return new Atom<T>(path, valueProvider);
+			AtomFamilyNode<T,TParam> node = new AtomFamilyNode<T,TParam>(key, creatorInfo, valueProvider, effects);
+			return node.Get;
 		}
 
 		public static AtomFamily<T,TParam> Create<T,TParam>(Expression<Func<Atom<T>>> expression, Func<TParam, T?> keyedFactory,
+			IPrimitiveEffect<T>[]? effects = null,
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
-			[CallerLineNumber] int callerLineNumber = 0) 
-				where TParam : notnull
+			[CallerLineNumber] int callerLineNumber = 0) where TParam : notnull
 		{
-			Gaurd.NotNull(expression, nameof(expression));
+			Guard.NotNull(expression, nameof(expression));
+			effects ??= Array.Empty<IPrimitiveEffect<T>>();
 			string path = ExpressionUtility.GetPropertyPath(expression);
+			Key key = Key.From(path);
+			CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 			ValueProvider<T> valueProvider = ValueProvider.Create(keyedFactory);
-			return new Atom<T>(path, valueProvider);
+			AtomFamilyNode<T,TParam> node = new AtomFamilyNode<T,TParam>(key, creatorInfo, valueProvider, effects);
+			return node.Get;
 		}
 
 		public static AtomFamily<T,TParam> Create<T,TParam>(Expression<Func<Atom<T>>> expression, AtomFamily<T, TParam> atomFamily,
+			IPrimitiveEffect<T>[]? effects = null,
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
-			[CallerLineNumber] int callerLineNumber = 0) 
-				where TParam : notnull
+			[CallerLineNumber] int callerLineNumber = 0) where TParam : notnull
 		{
-			Gaurd.NotNull(expression, nameof(expression));
+			Guard.NotNull(expression, nameof(expression));
+			effects ??= Array.Empty<IPrimitiveEffect<T>>();
 			string path = ExpressionUtility.GetPropertyPath(expression);
+			Key key = Key.From(path);
+			CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 			ValueProvider<T> valueProvider = ValueProvider.Create(atomFamily);
-			return new Atom<T>(path, valueProvider);
+			AtomFamilyNode<T,TParam> node = new AtomFamilyNode<T,TParam>(key, creatorInfo, valueProvider, effects);
+			return node.Get;
 		}
 
 		public static AtomFamily<T,TParam> Create<T,TParam>(Expression<Func<Atom<T>>> expression, AtomFamily<T, TParam> atomFamily, TParam fixedValue,
+			IPrimitiveEffect<T>[]? effects = null,
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
-			[CallerLineNumber] int callerLineNumber = 0) 
-				where TParam : notnull
+			[CallerLineNumber] int callerLineNumber = 0) where TParam : notnull
 		{
-			Gaurd.NotNull(expression, nameof(expression));
+			Guard.NotNull(expression, nameof(expression));
+			effects ??= Array.Empty<IPrimitiveEffect<T>>();
 			string path = ExpressionUtility.GetPropertyPath(expression);
+			Key key = Key.From(path);
+			CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 			ValueProvider<T> valueProvider = ValueProvider.Create(atomFamily);
-			return new Atom<T>(path, valueProvider);
+			AtomFamilyNode<T,TParam> node = new AtomFamilyNode<T,TParam>(key, creatorInfo, valueProvider, effects);
+			return node.Get;
 		}
 
 		public static AtomFamily<T,TParam> Create<T,TParam>(Expression<Func<Atom<T>>> expression, Atom<T> atom,
+			IPrimitiveEffect<T>[]? effects = null,
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
-			[CallerLineNumber] int callerLineNumber = 0)		{
-			Gaurd.NotNull(expression, nameof(expression));
+			[CallerLineNumber] int callerLineNumber = 0) where TParam : notnull
+		{
+			Guard.NotNull(expression, nameof(expression));
+			effects ??= Array.Empty<IPrimitiveEffect<T>>();
 			string path = ExpressionUtility.GetPropertyPath(expression);
+			Key key = Key.From(path);
+			CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 			ValueProvider<T> valueProvider = ValueProvider.Create(atom);
-			return new Atom<T>(path, valueProvider);
+			AtomFamilyNode<T,TParam> node = new AtomFamilyNode<T,TParam>(key, creatorInfo, valueProvider, effects);
+			return node.Get;
 		}
 
 		public static AtomFamily<T,TParam> Create<T,TParam>(Expression<Func<Atom<T>>> expression, Selector<T> selector,
+			IPrimitiveEffect<T>[]? effects = null,
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
-			[CallerLineNumber] int callerLineNumber = 0)		{
-			Gaurd.NotNull(expression, nameof(expression));
+			[CallerLineNumber] int callerLineNumber = 0) where TParam : notnull
+		{
+			Guard.NotNull(expression, nameof(expression));
+			effects ??= Array.Empty<IPrimitiveEffect<T>>();
 			string path = ExpressionUtility.GetPropertyPath(expression);
+			Key key = Key.From(path);
+			CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 			ValueProvider<T> valueProvider = ValueProvider.Create(selector);
-			return new Atom<T>(path, valueProvider);
+			AtomFamilyNode<T,TParam> node = new AtomFamilyNode<T,TParam>(key, creatorInfo, valueProvider, effects);
+			return node.Get;
 		}
 
 

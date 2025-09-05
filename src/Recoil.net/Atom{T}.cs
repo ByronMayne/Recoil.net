@@ -1,9 +1,7 @@
-﻿using Recoil;
-using RecoilNet.Diagnostics;
+﻿using RecoilNet.Diagnostics;
 using RecoilNet.Effects;
-using RecoilNet.State;
-using RecoilNet.Utility;
 using RecoilNet.Values;
+using System.Runtime.CompilerServices;
 
 namespace RecoilNet
 {
@@ -22,14 +20,16 @@ namespace RecoilNet
 		/// </summary>
 		public IReadOnlyList<IPrimitiveEffect<T>> Effects { get; }
 
-		internal Atom(
+		public ValueProvider<T> DefaultValue => m_defaultValueProvider;
+
+        internal Atom(
 			Key key, 
 			CallerInfo creatorInfo,
 			ValueProvider<T> defaultValueProvider, 
 			IPrimitiveEffect<T>[] effects) : base(key,  creatorInfo, true)
 		{
-            Gaurd.NotNull(defaultValueProvider);
-			Gaurd.NotNull(effects, nameof(effects));
+            Guard.NotNull(defaultValueProvider);
+			Guard.NotNull(effects, nameof(effects));
 
             Effects = effects ?? Array.Empty<IPrimitiveEffect<T>>();
 			m_defaultValueProvider = defaultValueProvider;

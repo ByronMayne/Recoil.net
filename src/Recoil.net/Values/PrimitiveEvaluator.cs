@@ -1,5 +1,4 @@
-﻿using RecoilNet.State;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -13,7 +12,7 @@ namespace RecoilNet.Values
 
         public PrimitiveEvaluator(IRecoilStore? recoilStore, Primitive<T> primitive)
         {
-            Gaurd.NotNull(primitive);
+            Guard.NotNull(primitive);
 
             m_recoilStore = recoilStore;
             m_primitive = primitive;
@@ -22,24 +21,24 @@ namespace RecoilNet.Values
 
         public Task<TValue?> GetAsync<TValue>(Atom<TValue> atom)
         {
-            Gaurd.NotNull(atom);
+            Guard.NotNull(atom);
             m_dependents.Add(atom);
             atom.AddDependent(m_primitive);
-            return atom.GetValueAsync(m_recoilStore);
+            return Recoil.GetValueAsync(m_recoilStore, atom);
         }
 
         public Task<TValue?> GetAsync<TValue>(Selector<TValue> selector)
         {
-            Gaurd.NotNull(selector);
+            Guard.NotNull(selector);
             m_dependents.Add(selector);
             selector.AddDependent(m_primitive);
-            return selector.GetValueAsync(m_recoilStore);
+            return Recoil.GetValueAsync(m_recoilStore, selector);
         }
 
         public Task<TValue?> GetAsync<TValue, TParam>(AtomFamily<TValue, TParam> atomFamily, TParam parameter) where TParam : notnull
         {
-            Gaurd.NotNull(atomFamily);
-            Gaurd.NotNull(parameter);
+            Guard.NotNull(atomFamily);
+            Guard.NotNull(parameter);
             Atom<TValue> atom = atomFamily(parameter);
             return GetAsync(atom);
         }

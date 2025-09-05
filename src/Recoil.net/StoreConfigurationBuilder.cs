@@ -38,7 +38,7 @@ namespace RecoilNet
 		/// </summary>
 		public StoreConfigurationBuilder AddComponent<T>(T instance) where T : IStoreComponent
 		{
-            Gaurd.NotNull(instance);
+            Guard.NotNull(instance);
 			m_components.Add(instance);
 			return this;
 		}
@@ -49,7 +49,7 @@ namespace RecoilNet
 		/// <returns></returns>
 		public IRecoilStore Build()
 		{
-			return new RecoilStore(m_components);
+			return new RecoilStore();
 		}
 	}
 }

@@ -1,8 +1,9 @@
-﻿using System.Runtime.CompilerServices;
+﻿using RecoilNet.Polyfils;
+using System.Runtime.CompilerServices;
 
 namespace RecoilNet
 {
-    internal static class Gaurd
+    internal static class Guard
     {
         public static void NotNull<T>(T? value, [CallerArgumentExpression(nameof(value))] string expression = "")
         {

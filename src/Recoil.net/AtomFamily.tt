@@ -10,6 +10,9 @@ using System;
 using RecoilNet;
 using RecoilNet.Utility;
 using RecoilNet.Values;
+using RecoilNet.Diagnostics;
+using RecoilNet.Effects;
+
 using System.Linq.Expressions;
 using RecoilNet.State;
 using System.Runtime.CompilerServices;
@@ -21,20 +24,23 @@ namespace Recoil
 <# foreach(var overload in MethodOverloads) { #>
 <# if(overload.IsFamily) { continue; } #>
 		public static AtomFamily<T,TParam> Create<T,TParam>(Expression<Func<Atom<T>>> expression<#= overload.RenderAsParameters()#>,
+			IPrimitiveEffect<T>[]? effects = null,
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
-			[CallerLineNumber] int callerLineNumber = 0)<# if(overload.HasTypeParam) { #> 
-				where TParam : notnull
-<#}#>
+			[CallerLineNumber] int callerLineNumber = 0) where TParam : notnull
 		{
 			Gaurd.NotNull(expression, nameof(expression));
+			effects ??= Array.Empty<IPrimitiveEffect<T>>();
 			string path = ExpressionUtility.GetPropertyPath(expression);
+			Key key = Key.From(path);
+			CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 <# if(overload.Parameters.Count > 0) { #>
 			ValueProvider<T> valueProvider = ValueProvider.Create(<#=overload.Parameters[0].Value#>);
-			return new Atom<T>(path, valueProvider);
+			AtomFamilyNode<T,TParam> node = new AtomFamilyNode<T,TParam>(key, creatorInfo, valueProvider, effects);
 <#} else {#>
-			return new Atom<T>(path);
+			AtomFamilyNode<T,TParam> node = new AtomFamilyNode<T,TParam>(key, creatorInfo, ValueProvider<T>.Default, effects);
 <#}#>
+			return node.Get;
 		}
 
 <#}#>

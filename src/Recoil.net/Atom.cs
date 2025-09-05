@@ -1,16 +1,14 @@
 ﻿
 
 using System;
-using RecoilNet;
 using RecoilNet.Utility;
 using RecoilNet.Values;
 using System.Linq.Expressions;
-using RecoilNet.State;
 using System.Runtime.CompilerServices;
 using RecoilNet.Effects;
 using RecoilNet.Diagnostics;
 
-namespace Recoil
+namespace RecoilNet
 {
 	public static partial class Atom
 	{
@@ -18,7 +16,7 @@ namespace Recoil
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
 			[CallerLineNumber] int callerLineNumber = 0)		{
-				Gaurd.NotNull(expression, nameof(expression));
+				Guard.NotNull(expression, nameof(expression));
 				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 				string path = ExpressionUtility.GetPropertyPath(expression);
 				Key key = Key.From(path);
@@ -32,7 +30,7 @@ namespace Recoil
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
 			[CallerLineNumber] int callerLineNumber = 0)		{
-				Gaurd.NotNull(expression, nameof(expression));
+				Guard.NotNull(expression, nameof(expression));
 				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 				string path = ExpressionUtility.GetPropertyPath(expression);
 				Key key = Key.From(path);
@@ -44,7 +42,7 @@ namespace Recoil
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
 			[CallerLineNumber] int callerLineNumber = 0)		{
-				Gaurd.NotNull(expression, nameof(expression));
+				Guard.NotNull(expression, nameof(expression));
 				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 				string path = ExpressionUtility.GetPropertyPath(expression);
 				Key key = Key.From(path);
@@ -58,7 +56,7 @@ namespace Recoil
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
 			[CallerLineNumber] int callerLineNumber = 0)		{
-				Gaurd.NotNull(expression, nameof(expression));
+				Guard.NotNull(expression, nameof(expression));
 				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 				string path = ExpressionUtility.GetPropertyPath(expression);
 				Key key = Key.From(path);
@@ -70,7 +68,7 @@ namespace Recoil
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
 			[CallerLineNumber] int callerLineNumber = 0)		{
-				Gaurd.NotNull(expression, nameof(expression));
+				Guard.NotNull(expression, nameof(expression));
 				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 				string path = ExpressionUtility.GetPropertyPath(expression);
 				Key key = Key.From(path);
@@ -84,7 +82,7 @@ namespace Recoil
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
 			[CallerLineNumber] int callerLineNumber = 0)		{
-				Gaurd.NotNull(expression, nameof(expression));
+				Guard.NotNull(expression, nameof(expression));
 				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 				string path = ExpressionUtility.GetPropertyPath(expression);
 				Key key = Key.From(path);
@@ -96,7 +94,7 @@ namespace Recoil
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
 			[CallerLineNumber] int callerLineNumber = 0)		{
-				Gaurd.NotNull(expression, nameof(expression));
+				Guard.NotNull(expression, nameof(expression));
 				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 				string path = ExpressionUtility.GetPropertyPath(expression);
 				Key key = Key.From(path);
@@ -110,7 +108,7 @@ namespace Recoil
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
 			[CallerLineNumber] int callerLineNumber = 0)		{
-				Gaurd.NotNull(expression, nameof(expression));
+				Guard.NotNull(expression, nameof(expression));
 				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 				string path = ExpressionUtility.GetPropertyPath(expression);
 				Key key = Key.From(path);
@@ -122,7 +120,7 @@ namespace Recoil
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
 			[CallerLineNumber] int callerLineNumber = 0)		{
-				Gaurd.NotNull(expression, nameof(expression));
+				Guard.NotNull(expression, nameof(expression));
 				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 				string path = ExpressionUtility.GetPropertyPath(expression);
 				Key key = Key.From(path);
@@ -136,7 +134,7 @@ namespace Recoil
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
 			[CallerLineNumber] int callerLineNumber = 0)		{
-				Gaurd.NotNull(expression, nameof(expression));
+				Guard.NotNull(expression, nameof(expression));
 				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 				string path = ExpressionUtility.GetPropertyPath(expression);
 				Key key = Key.From(path);
@@ -148,7 +146,7 @@ namespace Recoil
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
 			[CallerLineNumber] int callerLineNumber = 0)		{
-				Gaurd.NotNull(expression, nameof(expression));
+				Guard.NotNull(expression, nameof(expression));
 				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 				string path = ExpressionUtility.GetPropertyPath(expression);
 				Key key = Key.From(path);
@@ -162,7 +160,7 @@ namespace Recoil
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
 			[CallerLineNumber] int callerLineNumber = 0)		{
-				Gaurd.NotNull(expression, nameof(expression));
+				Guard.NotNull(expression, nameof(expression));
 				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 				string path = ExpressionUtility.GetPropertyPath(expression);
 				Key key = Key.From(path);
@@ -174,7 +172,7 @@ namespace Recoil
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
 			[CallerLineNumber] int callerLineNumber = 0)		{
-				Gaurd.NotNull(expression, nameof(expression));
+				Guard.NotNull(expression, nameof(expression));
 				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 				string path = ExpressionUtility.GetPropertyPath(expression);
 				Key key = Key.From(path);
@@ -188,7 +186,7 @@ namespace Recoil
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
 			[CallerLineNumber] int callerLineNumber = 0)		{
-				Gaurd.NotNull(expression, nameof(expression));
+				Guard.NotNull(expression, nameof(expression));
 				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 				string path = ExpressionUtility.GetPropertyPath(expression);
 				Key key = Key.From(path);
@@ -202,7 +200,7 @@ namespace Recoil
 			[CallerLineNumber] int callerLineNumber = 0) 
 				where TParam : notnull
 		{
-				Gaurd.NotNull(expression, nameof(expression));
+				Guard.NotNull(expression, nameof(expression));
 				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 				string path = ExpressionUtility.GetPropertyPath(expression);
 				Key key = Key.From(path);
@@ -218,7 +216,7 @@ namespace Recoil
 			[CallerLineNumber] int callerLineNumber = 0) 
 				where TParam : notnull
 		{
-				Gaurd.NotNull(expression, nameof(expression));
+				Guard.NotNull(expression, nameof(expression));
 				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 				string path = ExpressionUtility.GetPropertyPath(expression);
 				Key key = Key.From(path);
@@ -232,7 +230,7 @@ namespace Recoil
 			[CallerLineNumber] int callerLineNumber = 0) 
 				where TParam : notnull
 		{
-				Gaurd.NotNull(expression, nameof(expression));
+				Guard.NotNull(expression, nameof(expression));
 				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 				string path = ExpressionUtility.GetPropertyPath(expression);
 				Key key = Key.From(path);
@@ -248,7 +246,7 @@ namespace Recoil
 			[CallerLineNumber] int callerLineNumber = 0) 
 				where TParam : notnull
 		{
-				Gaurd.NotNull(expression, nameof(expression));
+				Guard.NotNull(expression, nameof(expression));
 				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 				string path = ExpressionUtility.GetPropertyPath(expression);
 				Key key = Key.From(path);
@@ -262,7 +260,7 @@ namespace Recoil
 			[CallerLineNumber] int callerLineNumber = 0) 
 				where TParam : notnull
 		{
-				Gaurd.NotNull(expression, nameof(expression));
+				Guard.NotNull(expression, nameof(expression));
 				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 				string path = ExpressionUtility.GetPropertyPath(expression);
 				Key key = Key.From(path);
@@ -278,7 +276,7 @@ namespace Recoil
 			[CallerLineNumber] int callerLineNumber = 0) 
 				where TParam : notnull
 		{
-				Gaurd.NotNull(expression, nameof(expression));
+				Guard.NotNull(expression, nameof(expression));
 				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 				string path = ExpressionUtility.GetPropertyPath(expression);
 				Key key = Key.From(path);
@@ -290,7 +288,7 @@ namespace Recoil
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
 			[CallerLineNumber] int callerLineNumber = 0)		{
-				Gaurd.NotNull(expression, nameof(expression));
+				Guard.NotNull(expression, nameof(expression));
 				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 				string path = ExpressionUtility.GetPropertyPath(expression);
 				Key key = Key.From(path);
@@ -304,7 +302,7 @@ namespace Recoil
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
 			[CallerLineNumber] int callerLineNumber = 0)		{
-				Gaurd.NotNull(expression, nameof(expression));
+				Guard.NotNull(expression, nameof(expression));
 				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 				string path = ExpressionUtility.GetPropertyPath(expression);
 				Key key = Key.From(path);
@@ -316,7 +314,7 @@ namespace Recoil
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
 			[CallerLineNumber] int callerLineNumber = 0)		{
-				Gaurd.NotNull(expression, nameof(expression));
+				Guard.NotNull(expression, nameof(expression));
 				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 				string path = ExpressionUtility.GetPropertyPath(expression);
 				Key key = Key.From(path);
@@ -330,7 +328,7 @@ namespace Recoil
 			[CallerFilePath] string callerFilePath = "",
 			[CallerMemberName] string callerMemberName = "",
 			[CallerLineNumber] int callerLineNumber = 0)		{
-				Gaurd.NotNull(expression, nameof(expression));
+				Guard.NotNull(expression, nameof(expression));
 				CallerInfo creatorInfo = new CallerInfo(callerFilePath, callerMemberName, callerLineNumber);
 				string path = ExpressionUtility.GetPropertyPath(expression);
 				Key key = Key.From(path);

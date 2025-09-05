@@ -10,22 +10,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="FactoryHelpers.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="..\..\.editorconfig" Link=".editorconfig" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Nullable" Version="1.3.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="System.Threading.Channels" Version="9.0.8" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="Vogen" Version="8.0.1" />
+    <None Update="AtomFamily.tt">
+      <LastGenOutput>AtomFamily.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
     <None Update="Atom.tt">
       <LastGenOutput>Atom.cs</LastGenOutput>
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -33,13 +28,12 @@
     <None Update="Templates\Recoil.ttinclude">
       <Generator></Generator>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <Compile Update="AtomFamily.cs">
+      <DependentUpon>AtomFamily.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
     <Compile Update="Atom.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

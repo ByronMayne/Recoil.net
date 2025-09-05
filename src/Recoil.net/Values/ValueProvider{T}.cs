@@ -1,13 +1,5 @@
-﻿using RecoilNet.State;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Text;
-
-namespace RecoilNet.Values
+﻿namespace RecoilNet.Values
 {
-
-
     /// <summary>
     /// Provides a mechanism to evaluate and supply values of type <typeparamref name="T"/>.
     /// </summary>
@@ -70,9 +62,9 @@ namespace RecoilNet.Values
             ValueProviderType type,
             ValueProviderMethodSignature signature)
         {
-            Gaurd.NotNull(evaluation);
-            Gaurd.IsDefined(signature);
-            Gaurd.IsDefined(type);
+            Guard.NotNull(evaluation);
+            Guard.IsDefined(signature);
+            Guard.IsDefined(type);
 
             m_type = type;
             m_signature = signature;
@@ -96,14 +88,58 @@ namespace RecoilNet.Values
             object? fixedParameter,
             Type parameterType)
         {
-            Gaurd.NotNull(evaluation);
-            Gaurd.IsDefined(signature);
+            Guard.NotNull(evaluation);
+            Guard.IsDefined(signature);
 
             m_type = type;
             m_signature = signature;
             m_evaluation = evaluation;
             m_parameter = fixedParameter;
             m_parameterType = parameterType;
+        }
+
+        /// <summary>
+        /// Converts the value to a fixed parameter for the value provider.
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        /// <exception cref="ArgumentException"></exception>
+        public ValueProvider<T> WithParameter(object? parameter)
+        {
+            if (m_parameterType is null)
+            {
+                throw new InvalidOperationException("This ValueProvider does not support parameters.");
+            }
+            if (parameter is not null && !m_parameterType.IsAssignableFrom(parameter.GetType()))
+            {
+                throw new ArgumentException($"The parameter must be of type {m_parameterType}.", nameof(parameter));
+            }
+            return new ValueProvider<T>(
+                m_evaluation,
+                m_type,
+                m_signature,
+                parameter,
+                m_parameterType);
+        }
+
+        public Task<T?> GetValueAsync(IRecoilStore? recoilStore, object? parameter)
+        {
+            return InternalGetValueAsync(recoilStore, parameter);
+        }
+
+        private Task<T?> InternalGetValueAsync(IRecoilStore? recoilStore, object? parameter)
+        {
+            object?[] arguments = m_signature switch
+            {
+                ValueProviderMethodSignature.Parameter => [parameter],
+                ValueProviderMethodSignature.Store => [recoilStore],
+                ValueProviderMethodSignature.Store | ValueProviderMethodSignature.Parameter => [recoilStore, parameter ],
+                _ => Array.Empty<object?>(),
+            };
+
+            object? result = m_evaluation.DynamicInvoke(arguments);
+            return result is Task<T?> asTask ? asTask : Task.FromResult((T?)result);
         }
     }
 }

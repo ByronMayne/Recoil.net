@@ -10,7 +10,7 @@ namespace RecoilNet.Utility
 		/// </summary>
 		public static string GetPropertyPath<T>(Expression<T> expression)
 		{
-            Gaurd.NotNull(expression);
+            Guard.NotNull(expression);
 
 			if (expression.Body is not MemberExpression expressionMember)
 			{
